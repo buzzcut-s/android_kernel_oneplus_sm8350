@@ -660,6 +660,7 @@ static struct platform_driver msm_ion_driver = {
 #ifdef CONFIG_HIBERNATION
 		.pm = &msm_ion_pm_ops,
 #endif
+		.probe_type = PROBE_PREFER_ASYNCHRONOUS,
 	},
 };
 
