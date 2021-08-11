@@ -407,6 +407,7 @@ struct arm_smmu_device {
 	bool smmu_restore;
 
 	unsigned long			sync_timed_out;
+	bool				flush_walk_prefer_tlbiasid;
 };
 
 struct qsmmuv500_tbu_device {
