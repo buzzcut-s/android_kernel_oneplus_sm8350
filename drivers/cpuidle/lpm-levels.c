@@ -1064,7 +1064,9 @@ static int cluster_configure(struct lpm_cluster *cluster, int idx,
 #ifdef CONFIG_COMMON_CLK_QCOM_DEBUG
 			clock_debug_print_enabled();
 #endif
+#ifdef CONFIG_REGULATOR_QTI_DEBUG
 			regulator_debug_print_enabled();
+#endif
 		}
 
 		cpu = get_next_online_cpu(from_idle);
