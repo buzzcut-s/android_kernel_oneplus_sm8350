@@ -5502,6 +5502,17 @@ static int dwc3_otg_start_host(struct dwc3_msm *mdwc, int on)
 			atomic_read(&mdwc->dev->power.usage_count));
 		pm_runtime_mark_last_busy(mdwc->dev);
 		pm_runtime_put_sync_autosuspend(mdwc->dev);
+
+		/*
+		* The default request type PM_QOS_REQ_ALL_CORES is
+		* applicable to all CPU cores that are online and
+		* would have a power impact when there are more
+		* number of CPUs. PM_QOS_REQ_AFFINE_IRQ request
+		* type shall update/apply the vote only to that CPU to
+		* which IRQ's affinity is set to.
+		*/
+		mdwc->pm_qos_req_dma.type = PM_QOS_REQ_AFFINE_IRQ;
+		mdwc->pm_qos_req_dma.irq = dwc->irq;
 		pm_qos_add_request(&mdwc->pm_qos_req_dma,
 				PM_QOS_CPU_DMA_LATENCY, PM_QOS_DEFAULT_VALUE);
 		/* start in perf mode for better performance initially */
@@ -5639,6 +5650,17 @@ static int dwc3_otg_start_peripheral(struct dwc3_msm *mdwc, int on)
 		}
 
 		usb_gadget_vbus_connect(&dwc->gadget);
+
+		/*
+		* The default request type PM_QOS_REQ_ALL_CORES is
+		* applicable to all CPU cores that are online and
+		* would have a power impact when there are more
+		* number of CPUs. PM_QOS_REQ_AFFINE_IRQ request
+		* type shall update/apply the vote only to that CPU to
+		* which IRQ's affinity is set to.
+		*/
+		mdwc->pm_qos_req_dma.type = PM_QOS_REQ_AFFINE_IRQ;
+		mdwc->pm_qos_req_dma.irq = dwc->irq;
 		pm_qos_add_request(&mdwc->pm_qos_req_dma,
 				PM_QOS_CPU_DMA_LATENCY, PM_QOS_DEFAULT_VALUE);
 		/* start in perf mode for better performance initially */
