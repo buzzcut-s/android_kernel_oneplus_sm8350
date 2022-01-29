@@ -24,7 +24,7 @@ block=/dev/block/bootdevice/by-name/boot
 is_slot_device=1
 ramdisk_compression=gzip
 " > kernelzip/props
-	cp -rp ~/android/anykernel/* kernelzip/
+	cp -rp /home/piyush/OP9P/AnyKernel3/* kernelzip/
 	find . -name '*.dtb' -exec cat {} + > kernelzip/dtb
 	cp arch/arm64/boot/dtbo.img kernelzip/
 	touch kernelzip/vendor_boot
