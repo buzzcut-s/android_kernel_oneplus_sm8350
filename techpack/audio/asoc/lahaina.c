@@ -963,7 +963,7 @@ static struct wcd_mbhc_config wcd_mbhc_cfg = {
 
 /* set audio task affinity to core 1 & 2 */
 static const unsigned int audio_core_list[] = {1, 2};
-static cpumask_t audio_cpu_map = CPU_MASK_NONE;
+static atomic_t audio_cpu_map;
 static struct dev_pm_qos_request *msm_audio_req;
 static unsigned int qos_client_active_cnt;
 
@@ -971,6 +971,7 @@ static void msm_audio_add_qos_request(void)
 {
 	int i;
 	int cpu = 0;
+	unsigned long affined_cpus = 0;
 
 	msm_audio_req = kcalloc(num_possible_cpus(),
 		sizeof(struct dev_pm_qos_request), GFP_KERNEL);
@@ -982,10 +983,11 @@ static void msm_audio_add_qos_request(void)
 			pr_err("%s incorrect cpu id: %d specified.\n",
 				__func__, audio_core_list[i]);
 		else
-			cpumask_set_cpu(audio_core_list[i], &audio_cpu_map);
+			atomic_set(&audio_cpu_map, BIT(1) | BIT(2));
 	}
 
-	for_each_cpu(cpu, &audio_cpu_map) {
+	affined_cpus = atomic_read(&audio_cpu_map);
+	for_each_cpu(cpu, to_cpumask(&affined_cpus)) {
 		dev_pm_qos_add_request(get_cpu_device(cpu),
 			&msm_audio_req[cpu],
 			DEV_PM_QOS_RESUME_LATENCY,
@@ -999,7 +1001,8 @@ static void msm_audio_remove_qos_request(void)
 	int cpu = 0;
 
 	if (msm_audio_req) {
-		for_each_cpu(cpu, &audio_cpu_map) {
+		unsigned long affined_cpus = atomic_read(&audio_cpu_map);
+		for_each_cpu(cpu, to_cpumask(&affined_cpus)) {
 			dev_pm_qos_remove_request(
 				&msm_audio_req[cpu]);
 			pr_debug("%s remove cpu affinity of core %d.\n",
@@ -1014,7 +1017,8 @@ static void msm_audio_update_qos_request(u32 latency)
 	int cpu = 0;
 
 	if (msm_audio_req) {
-		for_each_cpu(cpu, &audio_cpu_map) {
+		unsigned long affined_cpus = atomic_read(&audio_cpu_map);
+		for_each_cpu(cpu, to_cpumask(&affined_cpus)) {
 			dev_pm_qos_update_request(
 				&msm_audio_req[cpu], latency);
 			pr_debug("%s update latency of core %d to %ul.\n",
