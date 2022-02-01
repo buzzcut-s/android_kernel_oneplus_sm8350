@@ -6492,6 +6492,8 @@ CONFIG_SBITMAP=y
 # Kernel hacking
 #
 
+CONFIG_FRAME_WARN=0
+
 #
 # printk and dmesg options
 #
