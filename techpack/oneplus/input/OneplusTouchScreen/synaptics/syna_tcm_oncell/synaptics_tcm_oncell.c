@@ -3,6 +3,7 @@
 #include <linux/kthread.h>
 #include <linux/interrupt.h>
 #include <linux/regulator/consumer.h>
+#include <linux/i2c-msm-geni.h>
 #include "synaptics_tcm_oncell.h"
 #include <linux/fs.h>
 
@@ -4746,6 +4747,10 @@ static int syna_tcm_remove(struct i2c_client *client)
 	RELEASE_BUFFER(tcm_info->in);
 
 	kfree(tcm_info);
+
+	pm_qos_remove_request(&ts->pm_touch_req);
+	pm_qos_remove_request(&ts->pm_i2c_req);
+
 	kfree(ts);
 
 	return 0;
