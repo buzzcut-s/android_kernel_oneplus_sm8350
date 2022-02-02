@@ -16,6 +16,7 @@
 #include <linux/oem/boot_mode.h>
 #include <linux/iio/consumer.h>
 #include <linux/alarmtimer.h>
+#include <linux/i2c-msm-geni.h>
 
 #ifndef TPD_USE_EINT
 #include <linux/hrtimer.h>
@@ -1047,6 +1048,11 @@ static irqreturn_t tp_irq_thread_fn(int irq, void *dev_id)
 {
 	struct touchpanel_data *ts = (struct touchpanel_data *)dev_id;
 
+	/* prevent CPU from entering deep sleep */
+	pm_qos_update_request(&ts->pm_touch_req, 100);
+	pm_qos_update_request(&ts->pm_i2c_req, 100);
+	pm_wakeup_event(&ts->client->dev, MSEC_PER_SEC);
+
 	if (ts->int_mode == BANNABLE) {
 		__pm_stay_awake(&ts->source);	//avoid system enter suspend lead to i2c error
 		mutex_lock(&ts->mutex);
@@ -1056,6 +1062,10 @@ static irqreturn_t tp_irq_thread_fn(int irq, void *dev_id)
 	} else {
 		tp_work_func_unlock(ts);
 	}
+
+	pm_qos_update_request(&ts->pm_touch_req, PM_QOS_DEFAULT_VALUE);
+	pm_qos_update_request(&ts->pm_i2c_req, PM_QOS_DEFAULT_VALUE);
+
 	return IRQ_HANDLED;
 }
 #endif
@@ -5222,15 +5232,33 @@ void esd_handle_switch(struct esd_information *esd_info, bool on)
 	mutex_unlock(&esd_info->esd_lock);
 }
 
+static void tp_pm_qos_prepare(struct touchpanel_data *ts)
+{
+	ts->pm_i2c_req.type = PM_QOS_REQ_AFFINE_IRQ;
+	ts->pm_i2c_req.irq = geni_i2c_get_adap_irq(ts->client);
+	irq_set_perf_affinity(ts->pm_i2c_req.irq, IRQF_PERF_AFFINE);
+	pm_qos_add_request(&ts->pm_i2c_req, PM_QOS_CPU_DMA_LATENCY,
+			PM_QOS_DEFAULT_VALUE);
+
+	ts->pm_touch_req.type = PM_QOS_REQ_AFFINE_IRQ;
+	ts->pm_touch_req.irq = ts->client->irq;
+	pm_qos_add_request(&ts->pm_touch_req, PM_QOS_CPU_DMA_LATENCY,
+			PM_QOS_DEFAULT_VALUE);
+}
+
 int tp_register_irq_func(struct touchpanel_data *ts)
 {
 	int ret = 0;
 
 #ifdef TPD_USE_EINT
 	if (gpio_is_valid(ts->hw_res.irq_gpio)) {
+		tp_pm_qos_prepare(ts);
+
 		TPD_DEBUG("%s, irq_gpio is %d, ts->irq is %d\n", __func__, ts->hw_res.irq_gpio, ts->irq);
 		ret = request_threaded_irq(ts->irq, NULL, tp_irq_thread_fn, ts->irq_flags | IRQF_ONESHOT | IRQF_PERF_AFFINE, TPD_DEVICE, ts);
 		if (ret < 0) {
+			pm_qos_remove_request(&ts->pm_touch_req);
+			pm_qos_remove_request(&ts->pm_i2c_req);
 			TPD_INFO("%s request_threaded_irq ret is %d\n", __func__, ret);
 		}
 	} else {
@@ -5330,6 +5358,13 @@ void sec_ts_pinctrl_configure(struct hw_resource *hw_res, bool enable)
 				TPD_INFO("%s could not set suspend pinstate", __func__);
 		}
 	}
+}
+
+static void tp_free_irq(struct touchpanel_data *ts)
+{
+	pm_qos_remove_request(&ts->pm_touch_req);
+	pm_qos_remove_request(&ts->pm_i2c_req);
+	free_irq(ts->irq, ts);
 }
 
 /**
@@ -5815,7 +5850,7 @@ int register_common_touch_device(struct touchpanel_data *pdata)
 	kfree(ts->earsense_delta);
 
  threaded_irq_free:
-	free_irq(ts->irq, ts);
+	tp_free_irq(ts);
 
  manu_info_alloc_err:
 	kfree(ts->panel_data.manufacture_info.version);
@@ -5830,7 +5865,7 @@ int register_common_touch_device(struct touchpanel_data *pdata)
 
  err_check_functionality_failed:
 	if (ts->int_mode == UNBANNABLE) {
-		free_irq(ts->irq, ts);
+		tp_free_irq(ts);
 	}
 	//ts->ts_ops->power_control(ts->chip_data, false);
 
@@ -5999,7 +6034,7 @@ static void tp_resume(struct device *dev)
 		goto NO_NEED_RESUME;
 
 	//free irq at first
-	free_irq(ts->irq, ts);
+	tp_free_irq(ts);
 
 	if (ts->ts_ops->reinit_device) {
 		ts->ts_ops->reinit_device(ts->chip_data);
