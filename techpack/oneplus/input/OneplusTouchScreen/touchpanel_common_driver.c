@@ -1047,6 +1047,11 @@ static irqreturn_t tp_irq_thread_fn(int irq, void *dev_id)
 {
 	struct touchpanel_data *ts = (struct touchpanel_data *)dev_id;
 
+	/* prevent CPU from entering deep sleep */
+	pm_qos_update_request(&ts->pm_touch_req, 100);
+	pm_qos_update_request(&ts->pm_i2c_req, 100);
+	pm_wakeup_event(&ts->client->dev, MSEC_PER_SEC);
+
 	if (ts->int_mode == BANNABLE) {
 		__pm_stay_awake(&ts->source);	//avoid system enter suspend lead to i2c error
 		mutex_lock(&ts->mutex);
@@ -1056,6 +1061,10 @@ static irqreturn_t tp_irq_thread_fn(int irq, void *dev_id)
 	} else {
 		tp_work_func_unlock(ts);
 	}
+
+	pm_qos_update_request(&ts->pm_touch_req, PM_QOS_DEFAULT_VALUE);
+	pm_qos_update_request(&ts->pm_i2c_req, PM_QOS_DEFAULT_VALUE);
+
 	return IRQ_HANDLED;
 }
 #endif
