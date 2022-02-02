@@ -3,4 +3,5 @@
  * Copyright (C) 2020 Sultan Alsawaf <sultan@kerneltoast.com>.
  */
 
+struct i2c_client;
 int geni_i2c_get_adap_irq(struct i2c_client *client);
