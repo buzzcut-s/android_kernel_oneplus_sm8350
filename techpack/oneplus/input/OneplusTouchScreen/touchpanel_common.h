@@ -16,6 +16,7 @@
 #include <linux/input.h>
 #include <linux/gpio.h>
 #include <linux/seq_file.h>
+#include <linux/pm_qos.h>
 #include <linux/proc_fs.h>
 #include <linux/irq.h>
 #include <linux/interrupt.h>
@@ -600,6 +601,9 @@ struct touchpanel_data {
 	size_t result_max_len;
 	size_t result_flag;
 	size_t result_cur_len;
+
+	struct pm_qos_request pm_i2c_req;
+	struct pm_qos_request pm_touch_req;
 };
 
 void log_buf_write(struct touchpanel_data *ts, u8 value);

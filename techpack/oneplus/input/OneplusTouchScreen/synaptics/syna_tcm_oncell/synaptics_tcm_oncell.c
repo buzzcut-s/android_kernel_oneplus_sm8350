@@ -3,6 +3,7 @@
 #include <linux/kthread.h>
 #include <linux/interrupt.h>
 #include <linux/regulator/consumer.h>
+#include <linux/i2c-msm-geni.h>
 #include "synaptics_tcm_oncell.h"
 #include <linux/fs.h>
 
@@ -4679,10 +4680,23 @@ static int syna_tcm_probe(struct i2c_client *client, const struct i2c_device_id 
 	INIT_BUFFER(tcm_info->test_hcd->test_resp, false);
 	INIT_BUFFER(tcm_info->test_hcd->test_out, false);
 
+	ts->pm_i2c_req.type = PM_QOS_REQ_AFFINE_IRQ;
+	ts->pm_i2c_req.irq = geni_i2c_get_adap_irq(client);
+	irq_set_perf_affinity(ts->pm_i2c_req.irq, IRQF_PERF_AFFINE);
+	pm_qos_add_request(&ts->pm_i2c_req, PM_QOS_CPU_DMA_LATENCY,
+			PM_QOS_DEFAULT_VALUE);
+
+	ts->pm_touch_req.type = PM_QOS_REQ_AFFINE_IRQ;
+	ts->pm_touch_req.irq = client->irq;
+	pm_qos_add_request(&ts->pm_touch_req, PM_QOS_CPU_DMA_LATENCY,
+			PM_QOS_DEFAULT_VALUE);
+
 	//9. register common part of touchpanel driver
 	retval = register_common_touch_device(ts);
 	if (retval < 0 && (retval != -EFTM)) {
 		TPD_INFO("Failed to init device information\n");
+		pm_qos_remove_request(&ts->pm_touch_req);
+		pm_qos_remove_request(&ts->pm_i2c_req);
 		goto err_register_driver;
 	}
 	ts->mode_switch_type = SINGLE;
@@ -4746,6 +4760,10 @@ static int syna_tcm_remove(struct i2c_client *client)
 	RELEASE_BUFFER(tcm_info->in);
 
 	kfree(tcm_info);
+
+	pm_qos_remove_request(&ts->pm_touch_req);
+	pm_qos_remove_request(&ts->pm_i2c_req);
+
 	kfree(ts);
 
 	return 0;
