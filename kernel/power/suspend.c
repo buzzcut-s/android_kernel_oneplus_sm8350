@@ -623,7 +623,7 @@ int pm_suspend(suspend_state_t state)
 	if (state <= PM_SUSPEND_ON || state >= PM_SUSPEND_MAX)
 		return -EINVAL;
 
-	pr_info("suspend entry (%s)\n", mem_sleep_labels[state]);
+	pr_debug("suspend entry (%s)\n", mem_sleep_labels[state]);
 	if (state == PM_SUSPEND_MEM)
 		place_marker("M - Low Power Mode Start");
 	error = enter_state(state);
@@ -635,7 +635,7 @@ int pm_suspend(suspend_state_t state)
 		if (state == PM_SUSPEND_MEM)
 			place_marker("M - Low Power Mode Complete");
 	}
-	pr_info("suspend exit\n");
+	pr_debug("suspend exit\n");
 	return error;
 }
 EXPORT_SYMBOL(pm_suspend);
