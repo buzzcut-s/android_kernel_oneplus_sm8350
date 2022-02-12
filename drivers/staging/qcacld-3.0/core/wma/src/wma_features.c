@@ -2376,28 +2376,6 @@ wma_wake_reason_ap_assoc_lost(t_wma_handle *wma, void *event, uint32_t len)
 	return 0;
 }
 
-static const char *wma_vdev_type_str(uint32_t vdev_type)
-{
-	switch (vdev_type) {
-	case WMI_VDEV_TYPE_AP:
-		return "AP";
-	case WMI_VDEV_TYPE_STA:
-		return "STA";
-	case WMI_VDEV_TYPE_IBSS:
-		return "IBSS";
-	case WMI_VDEV_TYPE_MONITOR:
-		return "MONITOR";
-	case WMI_VDEV_TYPE_NAN:
-		return "NAN";
-	case WMI_VDEV_TYPE_OCB:
-		return "OCB";
-	case WMI_VDEV_TYPE_NDI:
-		return "NDI";
-	default:
-		return "unknown";
-	}
-}
-
 static int wma_wake_event_packet(
 	t_wma_handle *wma,
 	WMI_WOW_WAKEUP_HOST_EVENTID_param_tlvs *event_param,
@@ -2465,7 +2443,7 @@ static int wma_wake_event_packet(
 		 * dump event buffer which contains more info regarding
 		 * current page fault.
 		 */
-		wma_info("PAGE_FAULT occurs during suspend: packet_len %u",
+		wma_debug("PAGE_FAULT occurs during suspend: packet_len %u",
 			 packet_len);
 		qdf_trace_hex_dump(QDF_MODULE_ID_WMA, QDF_TRACE_LEVEL_INFO,
 				   packet, packet_len);
@@ -2694,37 +2672,6 @@ static int wma_wake_event_piggybacked(
 	return errno;
 }
 
-static void wma_debug_assert_page_fault_wakeup(uint32_t reason)
-{
-	/* During DRV if page fault wake up then assert */
-	if ((WOW_REASON_PAGE_FAULT == reason) && (qdf_is_drv_connected()))
-		QDF_DEBUG_PANIC("Unexpected page fault wake up detected during DRV wow");
-}
-
-static void wma_wake_event_log_reason(t_wma_handle *wma,
-				      WOW_EVENT_INFO_fixed_param *wake_info)
-{
-	struct wma_txrx_node *vdev;
-
-	/* "Unspecified" means APPS triggered wake, else firmware triggered */
-	if (wake_info->wake_reason != WOW_REASON_UNSPECIFIED) {
-		vdev = &wma->interfaces[wake_info->vdev_id];
-		wma_nofl_alert("WLAN triggered wakeup: %s (%d), vdev: %d (%s)",
-			      wma_wow_wake_reason_str(wake_info->wake_reason),
-			      wake_info->wake_reason,
-			      wake_info->vdev_id,
-			      wma_vdev_type_str(vdev->type));
-		wma_debug_assert_page_fault_wakeup(wake_info->wake_reason);
-	} else if (!wmi_get_runtime_pm_inprogress(wma->wmi_handle)) {
-		wma_nofl_alert("Non-WLAN triggered wakeup: %s (%d)",
-			      wma_wow_wake_reason_str(wake_info->wake_reason),
-			      wake_info->wake_reason);
-	}
-
-	qdf_wow_wakeup_host_event(wake_info->wake_reason);
-	qdf_wma_wow_wakeup_stats_event(wma);
-}
-
 /**
  * wma_wow_wakeup_host_event() - wakeup host event handler
  * @handle: wma handle
@@ -2755,8 +2702,6 @@ int wma_wow_wakeup_host_event(void *handle, uint8_t *event, uint32_t len)
 		wma_err("received invalid vdev_id %d", wake_info->vdev_id);
 		return -EINVAL;
 	}
-
-	wma_wake_event_log_reason(wma, wake_info);
 
 	ucfg_pmo_psoc_wakeup_host_event_received(wma->psoc);
 
