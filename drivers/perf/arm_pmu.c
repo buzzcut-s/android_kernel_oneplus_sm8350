@@ -414,6 +414,8 @@ __hw_perf_event_init(struct perf_event *event)
 		local64_set(&hwc->period_left, hwc->sample_period);
 	}
 
+	cpumask_copy(&event->readable_on_cpus, &armpmu->supported_cpus);
+
 	return validate_group(event);
 }
 
