@@ -2956,11 +2956,19 @@ int adreno_gmu_fenced_write(struct adreno_device *adreno_dev,
 	unsigned int status, i;
 	const struct adreno_gpudev *gpudev = ADRENO_GPU_DEVICE(adreno_dev);
 	unsigned int reg_offset = gpudev->reg_offsets[offset];
+	static DEFINE_SPINLOCK(locky);
+	static u64 total, count;
+	volatile ktime_t tstart, stop;
+	unsigned long irq_flags;
+	int ret = 0;
+
+	local_irq_save(irq_flags);
+	tstart = ktime_get();
 
 	adreno_writereg(adreno_dev, offset, val);
 
 	if (!gmu_core_isenabled(KGSL_DEVICE(adreno_dev)))
-		return 0;
+		goto exit;
 
 	for (i = 0; i < GMU_CORE_LONG_WAKEUP_RETRY_LIMIT; i++) {
 		/*
@@ -2987,14 +2995,15 @@ int adreno_gmu_fenced_write(struct adreno_device *adreno_dev,
 	}
 
 	if (i < GMU_CORE_SHORT_WAKEUP_RETRY_LIMIT)
-		return 0;
+		goto exit;
 
 	if (i == GMU_CORE_LONG_WAKEUP_RETRY_LIMIT) {
 		dev_err(adreno_dev->dev.dev,
 			"Timed out waiting %d usecs to write fenced register 0x%x\n",
 			i * GMU_CORE_WAKEUP_DELAY_US,
 			reg_offset);
-		return -ETIMEDOUT;
+		ret = -ETIMEDOUT;
+		goto exit;
 	}
 
 	dev_err(adreno_dev->dev.dev,
@@ -3002,7 +3011,18 @@ int adreno_gmu_fenced_write(struct adreno_device *adreno_dev,
 		i * GMU_CORE_WAKEUP_DELAY_US,
 		reg_offset);
 
-	return 0;
+exit:
+	stop = ktime_get();
+	spin_lock(&locky);
+	if (smp_processor_id() == 7) {
+		total += ktime_to_ns(ktime_sub(stop, tstart));
+		count++;
+		printk("SARU: %llu ns\n", total / count);
+	}
+	spin_unlock(&locky);
+	local_irq_restore(irq_flags);
+
+	return ret;
 }
 
 bool adreno_is_cx_dbgc_register(struct kgsl_device *device,
