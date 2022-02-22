@@ -2980,7 +2980,7 @@ int adreno_gmu_fenced_write(struct adreno_device *adreno_dev,
 	unsigned int cpu;
 	int ret = 0;
 
-	local_irq_save(irq_flags);
+	spin_lock_irqsave(&locky, irq_flags);
 	tstart = ktime_get();
 
 	adreno_writereg(adreno_dev, offset, val);
@@ -3031,7 +3031,6 @@ int adreno_gmu_fenced_write(struct adreno_device *adreno_dev,
 
 exit:
 	stop = ktime_get();
-	spin_lock(&locky);
 	cpu = smp_processor_id();
 	if (cpu >= 0 && cpu <= 3) {
 		totalL += ktime_to_ns(ktime_sub(stop, tstart));
@@ -3048,8 +3047,7 @@ exit:
 		countP++;
 		printk("prime-%u SARU: %llu ns\n", cpu, totalP / countP);
 	}
-	spin_unlock(&locky);
-	local_irq_restore(irq_flags);
+	spin_unlock_irqrestore(&locky, irq_flags);
 
 	return ret;
 }
