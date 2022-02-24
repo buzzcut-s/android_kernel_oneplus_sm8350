@@ -2972,21 +2972,11 @@ int adreno_gmu_fenced_write(struct adreno_device *adreno_dev,
 	unsigned int status, i;
 	const struct adreno_gpudev *gpudev = ADRENO_GPU_DEVICE(adreno_dev);
 	unsigned int reg_offset = gpudev->reg_offsets[offset];
-	static DEFINE_SPINLOCK(locky);
-	static u64 totalL, totalB, totalP;
-	static u64 countL, countB, countP;
-	volatile ktime_t tstart, stop;
-	unsigned long irq_flags;
-	unsigned int cpu;
-	int ret = 0;
-
-	spin_lock_irqsave(&locky, irq_flags);
-	tstart = ktime_get();
 
 	adreno_writereg(adreno_dev, offset, val);
 
 	if (!gmu_core_isenabled(KGSL_DEVICE(adreno_dev)))
-		goto exit;
+		return 0;
 
 	for (i = 0; i < GMU_CORE_LONG_WAKEUP_RETRY_LIMIT; i++) {
 		/*
@@ -3013,15 +3003,14 @@ int adreno_gmu_fenced_write(struct adreno_device *adreno_dev,
 	}
 
 	if (i < GMU_CORE_SHORT_WAKEUP_RETRY_LIMIT)
-		goto exit;
+		return 0;
 
 	if (i == GMU_CORE_LONG_WAKEUP_RETRY_LIMIT) {
 		dev_err(adreno_dev->dev.dev,
 			"Timed out waiting %d usecs to write fenced register 0x%x\n",
 			i * GMU_CORE_WAKEUP_DELAY_US,
 			reg_offset);
-		ret = -ETIMEDOUT;
-		goto exit;
+		return -ETIMEDOUT;
 	}
 
 	dev_err(adreno_dev->dev.dev,
@@ -3029,27 +3018,7 @@ int adreno_gmu_fenced_write(struct adreno_device *adreno_dev,
 		i * GMU_CORE_WAKEUP_DELAY_US,
 		reg_offset);
 
-exit:
-	stop = ktime_get();
-	cpu = smp_processor_id();
-	if (cpu >= 0 && cpu <= 3) {
-		totalL += ktime_to_ns(ktime_sub(stop, tstart));
-		countL++;
-		printk("little-%u SARU: %llu ns\n", cpu, totalL / countL);
-	}
-	else if (cpu >= 4 && cpu <= 6) {
-		totalB += ktime_to_ns(ktime_sub(stop, tstart));
-		countB++;
-		printk("big-%u SARU: %llu ns\n", cpu, totalB / countB);
-	}
-	else if (cpu == 7) {
-		totalP += ktime_to_ns(ktime_sub(stop, tstart));
-		countP++;
-		printk("prime-%u SARU: %llu ns\n", cpu, totalP / countP);
-	}
-	spin_unlock_irqrestore(&locky, irq_flags);
-
-	return ret;
+	return 0;
 }
 
 bool adreno_is_cx_dbgc_register(struct kgsl_device *device,
