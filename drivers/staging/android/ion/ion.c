@@ -279,7 +279,6 @@ int __ion_device_add_heap(struct ion_heap *heap, struct module *owner)
 {
 	struct ion_device *dev = internal_dev;
 	int ret;
-	struct dentry *heap_root;
 
 	if (!heap || !heap->ops || !heap->ops->allocate || !heap->ops->free) {
 		pr_err("%s: invalid heap or heap_ops\n", __func__);
