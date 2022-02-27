@@ -177,6 +177,9 @@ int of_free_phandle_cache(void)
 
 	return 0;
 }
+#if !defined(CONFIG_MODULES)
+late_initcall_sync(of_free_phandle_cache);
+#endif
 
 /*
  * Caller must hold devtree_lock.
