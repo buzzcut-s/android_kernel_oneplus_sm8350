@@ -342,18 +342,14 @@ int cpu_boost_init(void)
 	struct cpu_sync *s;
 	struct cpufreq_policy *policy;
 	struct freq_qos_request *req;
-	struct sched_param param = { .sched_priority = 2 };
 
 	kthread_init_worker(&cpu_boost_worker);
-	cpu_boost_worker_thread = kthread_run_perf_critical(cpu_lp_mask,
+	cpu_boost_worker_thread = kthread_run_perf_critical(cpu_perf_mask,
 		kthread_worker_fn, &cpu_boost_worker, "cpu_boost_worker_thread");
 	if (IS_ERR(cpu_boost_worker_thread)) {
 		pr_err("cpu-boost: Failed to run perf critical kworker!\n");
 		return -EFAULT;
 	}
-	ret = sched_setscheduler(cpu_boost_worker_thread, SCHED_FIFO, &param);
-	if (ret)
-		pr_err("cpu-boost: Failed to set SCHED_FIFO!\n");
 
 	kthread_init_work(&input_boost_work, do_input_boost);
 	INIT_DELAYED_WORK(&input_boost_rem, do_input_boost_rem);
