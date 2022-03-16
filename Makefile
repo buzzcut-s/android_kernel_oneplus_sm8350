@@ -366,7 +366,7 @@ override CROSS_COMPILE	:= /home/piyush/OP9P/arm64-gcc/bin/aarch64-elf-
 override CROSS_COMPILE_ARM32	:= /home/piyush/OP9P/arm32-gcc/bin/arm-eabi-
 override LLVM := 1
 override CLANG_TRIPLE := aarch64-linux-gnu
-override LLVM_PATH := /home/piyush/OP9P/linux-x86-master-clang-r433403/bin/
+override LLVM_PATH := /home/piyush/OP9P/linux-x86-master-clang-r445002/bin/
 
 # Architecture as present in compile.h
 UTS_MACHINE 	:= $(ARCH)
