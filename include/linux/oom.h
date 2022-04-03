@@ -49,16 +49,12 @@ struct oom_control {
 	unsigned long totalpages;
 	struct task_struct *chosen;
 	long chosen_points;
-#ifdef CONFIG_PRIORITIZE_OOM_TASKS
-	short min_kill_adj;
-#endif
 
 	/* Used to print the constraint info. */
 	enum oom_constraint constraint;
 };
 
 extern struct mutex oom_lock;
-extern struct mutex oom_adj_mutex;
 
 static inline void set_current_oom_origin(void)
 {
@@ -134,11 +130,4 @@ extern struct task_struct *find_lock_task_mm(struct task_struct *p);
 extern int sysctl_oom_dump_tasks;
 extern int sysctl_oom_kill_allocating_task;
 extern int sysctl_panic_on_oom;
-extern int sysctl_reap_mem_on_sigkill;
-
-/* calls for LMK reaper */
-extern void add_to_oom_reaper(struct task_struct *p);
-extern void check_panic_on_foreground_kill(struct task_struct *p);
-#define ULMK_MAGIC "lmkd"
-#define PRE_KILL "PreKillActionT"
 #endif /* _INCLUDE_LINUX_OOM_H */

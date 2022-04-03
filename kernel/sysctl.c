@@ -145,7 +145,6 @@ static int ten_thousand = 10000;
 #ifdef CONFIG_PERF_EVENTS
 static int six_hundred_forty_kb = 640 * 1024;
 #endif
-static int __maybe_unused max_kswapd_threads = MAX_KSWAPD_THREADS;
 
 #ifdef CONFIG_SCHED_WALT
 static int neg_three = -3;
@@ -1710,13 +1709,6 @@ static struct ctl_table vm_table[] = {
 		.proc_handler	= proc_dointvec,
 	},
 	{
-		.procname       = "reap_mem_on_sigkill",
-		.data           = &sysctl_reap_mem_on_sigkill,
-		.maxlen         = sizeof(sysctl_reap_mem_on_sigkill),
-		.mode           = 0644,
-		.proc_handler   = proc_dointvec,
-	},
-	{
 		.procname	= "overcommit_ratio",
 		.data		= &sysctl_overcommit_ratio,
 		.maxlen		= sizeof(sysctl_overcommit_ratio),
@@ -1812,15 +1804,6 @@ static struct ctl_table vm_table[] = {
 		.proc_handler	= proc_dointvec_minmax,
 		.extra1		= SYSCTL_ZERO,
 		.extra2		= &two_hundred,
-	},
-	{
-		.procname       = "want_old_faultaround_pte",
-		.data           = &want_old_faultaround_pte,
-		.maxlen         = sizeof(want_old_faultaround_pte),
-		.mode           = 0644,
-		.proc_handler   = proc_dointvec_minmax,
-		.extra1         = SYSCTL_ZERO,
-		.extra2         = SYSCTL_ONE,
 	},
 #ifdef CONFIG_HUGETLB_PAGE
 	{
@@ -1923,17 +1906,6 @@ static struct ctl_table vm_table[] = {
 		.proc_handler	= watermark_boost_factor_sysctl_handler,
 		.extra1		= SYSCTL_ZERO,
 	},
-#ifdef CONFIG_MULTIPLE_KSWAPD
-	{
-		.procname	= "kswapd_threads",
-		.data		= &kswapd_threads,
-		.maxlen		= sizeof(kswapd_threads),
-		.mode		= 0644,
-		.proc_handler	= kswapd_threads_sysctl_handler,
-		.extra1		= SYSCTL_ONE,
-		.extra2		= &max_kswapd_threads,
-	},
-#endif
 	{
 		.procname	= "watermark_scale_factor",
 		.data		= &watermark_scale_factor,

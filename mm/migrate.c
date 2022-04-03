@@ -241,7 +241,7 @@ static bool remove_migration_pte(struct page *page, struct vm_area_struct *vma,
 		 */
 		entry = pte_to_swp_entry(*pvmw.pte);
 		if (is_write_migration_entry(entry))
-			pte = maybe_mkwrite(pte, vma->vm_flags);
+			pte = maybe_mkwrite(pte, vma);
 
 		if (unlikely(is_zone_device_page(new))) {
 			if (is_device_private_page(new)) {
@@ -1116,7 +1116,7 @@ static int __unmap_and_move(struct page *page, struct page *newpage,
 		VM_BUG_ON_PAGE(PageAnon(page) && !PageKsm(page) && !anon_vma,
 				page);
 		try_to_unmap(page,
-			TTU_MIGRATION|TTU_IGNORE_MLOCK|TTU_IGNORE_ACCESS, NULL);
+			TTU_MIGRATION|TTU_IGNORE_MLOCK|TTU_IGNORE_ACCESS);
 		page_was_mapped = 1;
 	}
 
@@ -1342,7 +1342,7 @@ static int unmap_and_move_huge_page(new_page_t get_new_page,
 
 	if (page_mapped(hpage)) {
 		try_to_unmap(hpage,
-			TTU_MIGRATION|TTU_IGNORE_MLOCK|TTU_IGNORE_ACCESS, NULL);
+			TTU_MIGRATION|TTU_IGNORE_MLOCK|TTU_IGNORE_ACCESS);
 		page_was_mapped = 1;
 	}
 
@@ -1416,8 +1416,6 @@ int migrate_pages(struct list_head *from, new_page_t get_new_page,
 	struct page *page2;
 	int swapwrite = current->flags & PF_SWAPWRITE;
 	int rc;
-
-	trace_mm_migrate_pages_start(mode, reason);
 
 	if (!swapwrite)
 		current->flags |= PF_SWAPWRITE;
@@ -1976,7 +1974,7 @@ bool pmd_trans_migrating(pmd_t pmd)
  * node. Caller is expected to have an elevated reference count on
  * the page that will be dropped by this function before returning.
  */
-int migrate_misplaced_page(struct page *page, struct vm_fault *vmf,
+int migrate_misplaced_page(struct page *page, struct vm_area_struct *vma,
 			   int node)
 {
 	pg_data_t *pgdat = NODE_DATA(node);
@@ -1989,7 +1987,7 @@ int migrate_misplaced_page(struct page *page, struct vm_fault *vmf,
 	 * with execute permissions as they are probably shared libraries.
 	 */
 	if (page_mapcount(page) != 1 && page_is_file_lru(page) &&
-	    (vmf->vma_flags & VM_EXEC))
+	    (vma->vm_flags & VM_EXEC))
 		goto out;
 
 	/*
@@ -2573,7 +2571,7 @@ static void migrate_vma_unmap(struct migrate_vma *migrate)
 			continue;
 
 		if (page_mapped(page)) {
-			try_to_unmap(page, flags, NULL);
+			try_to_unmap(page, flags);
 			if (page_mapped(page))
 				goto restore;
 		}
