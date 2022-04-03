@@ -4419,9 +4419,8 @@ int __handle_speculative_fault(struct mm_struct *mm, unsigned long address,
 	pol = __get_vma_policy(vma, address);
 	if (!pol)
 		pol = get_task_policy(current);
-	if (!pol)
-		if (pol && pol->mode == MPOL_INTERLEAVE)
-			goto out_put;
+	if (pol && pol->mode == MPOL_INTERLEAVE)
+		goto out_put;
 #endif
 
 	/*
