@@ -2565,7 +2565,6 @@ static vm_fault_t wp_page_copy(struct vm_fault *vmf)
 		put_page(old_page);
 	}
 	return page_copied ? VM_FAULT_WRITE : 0;
-out_uncharge:
 oom_free_new:
 	put_page(new_page);
 oom:
@@ -3088,7 +3087,6 @@ out:
 	return ret;
 out_nomap:
 	pte_unmap_unlock(vmf->pte, vmf->ptl);
-out_cancel_cgroup:
 out_page:
 	unlock_page(page);
 out_release:
