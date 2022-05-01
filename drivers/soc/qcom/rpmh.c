@@ -131,7 +131,7 @@ static struct cache_req *cache_rpm_request(struct rpmh_ctrlr *ctrlr,
 					   enum rpmh_state state,
 					   struct tcs_cmd *cmd)
 {
-	struct cache_req *req;
+	struct cache_req *req, *new_req = NULL;
 	unsigned long flags;
 	u32 old_sleep_val, old_wake_val;
 
@@ -139,13 +139,18 @@ static struct cache_req *cache_rpm_request(struct rpmh_ctrlr *ctrlr,
 	req = __find_req(ctrlr, cmd->addr);
 	if (req)
 		goto existing;
+	spin_unlock_irqrestore(&ctrlr->cache_lock, flags);
 
-	req = kzalloc(sizeof(*req), GFP_ATOMIC);
-	if (!req) {
-		req = ERR_PTR(-ENOMEM);
-		goto unlock;
-	}
+	new_req = kzalloc(sizeof(*new_req), GFP_ATOMIC);
+	if (!new_req)
+		return ERR_PTR(-ENOMEM);
 
+	spin_lock_irqsave(&ctrlr->cache_lock, flags);
+	req = __find_req(ctrlr, cmd->addr);
+	if (req)
+		goto existing;
+
+	req = new_req;
 	req->addr = cmd->addr;
 	req->sleep_val = req->wake_val = UINT_MAX;
 	list_add_tail(&req->list, &ctrlr->cache);
@@ -169,8 +174,10 @@ existing:
 			 req->sleep_val != UINT_MAX &&
 			 req->wake_val != UINT_MAX;
 
-unlock:
 	spin_unlock_irqrestore(&ctrlr->cache_lock, flags);
+
+	if (new_req && new_req != req)
+		kfree(new_req);
 
 	return req;
 }
