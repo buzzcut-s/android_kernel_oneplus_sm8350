@@ -134,10 +134,6 @@ static unsigned long long_max = LONG_MAX;
 static int one_hundred = 100;
 static int two_hundred = 200;
 static int one_thousand = 1000;
-#ifdef CONFIG_QCOM_HYP_CORE_CTL
-static int five_hundred = 500;
-static int five_thousand = 5000;
-#endif
 #ifdef CONFIG_PRINTK
 static int ten_thousand = 10000;
 #endif
@@ -365,17 +361,6 @@ static struct ctl_table kern_table[] = {
 		.mode		= 0644,
 		.proc_handler	= proc_dointvec,
 	},
-#ifdef CONFIG_QCOM_HYP_CORE_CTL
-	{
-		.procname	= "hh_suspend_timeout_ms",
-		.data		= &sysctl_hh_suspend_timeout_ms,
-		.maxlen		= sizeof(unsigned int),
-		.mode		= 0644,
-		.proc_handler	= proc_douintvec_minmax,
-		.extra1		= &five_hundred,
-		.extra2         = &five_thousand,
-	},
-#endif
 	{
 		.procname	= "sched_min_granularity_ns",
 		.data		= &sysctl_sched_min_granularity,
