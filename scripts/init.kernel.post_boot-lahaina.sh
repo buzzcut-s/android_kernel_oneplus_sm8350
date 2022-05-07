@@ -221,7 +221,7 @@ do
     echo 0 > $cpubw/bw_hwmon/guard_band_mbps
     echo 250 > $cpubw/bw_hwmon/up_scale
     echo 1600 > $cpubw/bw_hwmon/idle_mbps
-    echo 15258 > $cpubw/max_freq
+    echo 12298 > $cpubw/max_freq
     echo 40 > $cpubw/polling_interval
 done
 
@@ -241,7 +241,7 @@ do
     echo 0 > $llccbw/bw_hwmon/guard_band_mbps
     echo 250 > $llccbw/bw_hwmon/up_scale
     echo 1600 > $llccbw/bw_hwmon/idle_mbps
-    echo 12191 > $llccbw/max_freq
+    echo 6515 > $llccbw/max_freq
     echo 40 > $llccbw/polling_interval
 done
 
