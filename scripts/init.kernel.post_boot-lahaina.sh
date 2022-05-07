@@ -313,7 +313,7 @@ do
     echo 50 > $qoslat/mem_latency/ratio_ceil
 done
 echo N > /sys/module/lpm_levels/parameters/sleep_disabled
-echo s2idle > /sys/power/mem_sleep
+echo deep > /sys/power/mem_sleep
 
 # Setup readahead
 find /sys/devices -name read_ahead_kb | while read node; do echo 128 > $node; done
