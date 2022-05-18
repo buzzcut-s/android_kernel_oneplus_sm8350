@@ -34,7 +34,7 @@
 	#size-cells = <2>;
 
 	chosen {
-		bootargs = "noirqdebug log_buf_len=256K rcupdate.rcu_expedited=1 rcu_nocbs=0-7 kpti=off cgroup_disable=pressure";
+		bootargs = "noirqdebug log_buf_len=256K rcupdate.rcu_expedited=1 rcu_nocbs=0-7 isolcpus=1-7 nohz_full=1-7 loglevel=0 printk.devkmsg=on kpti=off cgroup_disable=pressure";
 	};
 
 	memory { device_type = "memory"; reg = <0 0 0 0>; };
