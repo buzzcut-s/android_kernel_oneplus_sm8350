@@ -725,9 +725,6 @@ static ssize_t store_##file_name					\
 	unsigned long val;						\
 	int ret;							\
 									\
- 	if (&policy->object == &policy->min)				\
- 		return count;						\
-									\
 	ret = sscanf(buf, "%lu", &val);					\
 	if (ret != 1)							\
 		return -EINVAL;						\
