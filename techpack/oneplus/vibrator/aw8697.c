@@ -30,7 +30,6 @@
 #include "aw8697_reg.h"
 #include "aw8697_config.h"
 #include <linux/oem/boot_mode.h>
-#include <linux/pm_qos.h>
 
 #include <linux/msm_drm_notify.h>
 #include <linux/fb.h>
@@ -60,8 +59,6 @@
 #define OP_AW_DEBUG
 #define OP_OCS_CALIBRATION_T_LENGTH 3500000
 
-#define PM_QOS_VALUE_VB 200
-struct pm_qos_request pm_qos_req_vb;
 #define RTP_INIT_OVERSTEP_THR 8192
 
 #define SCORE_MODE
@@ -1574,7 +1571,6 @@ static int aw8697_rtp_osc_calibration(struct aw8697 *aw8697)
     disable_irq(gpio_to_irq(aw8697->irq_gpio));
     /* haptic start */
     aw8697_haptic_start(aw8697);
-    pm_qos_add_request(&pm_qos_req_vb, PM_QOS_CPU_DMA_LATENCY, PM_QOS_VALUE_VB);
     while(1) {
         if(!aw8697_haptic_rtp_get_fifo_afi(aw8697)) {
             pr_info("%s !aw8697_haptic_rtp_get_fifo_afi done aw8697->rtp_cnt= %d \n", __func__,aw8697->rtp_cnt);
@@ -1608,7 +1604,6 @@ static int aw8697_rtp_osc_calibration(struct aw8697 *aw8697)
             break;
           }
     }
-    pm_qos_remove_request(&pm_qos_req_vb);
     enable_irq(gpio_to_irq(aw8697->irq_gpio));
 
     aw8697->osc_cali_flag =0;
