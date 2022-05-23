@@ -265,6 +265,9 @@
 				qcom,lm-split = <540 540>;
 				qcom,mdss-dsc-slice-height = <36>;
 				qcom,mdss-dsc-slice-width = <540>;
+
+				qcom,panel-roi-alignment = <540 36 540 36 540 36>;
+				qcom,partial-update-enabled = "single_roi";
 			};
 
 			timing@fhd_sdc_90 {
@@ -975,6 +978,9 @@
 				qcom,mdss-dsc-bit-per-pixel = <8>;
 				qcom,mdss-dsc-scr-version = <1>;
 				qcom,mdss-dsc-block-prediction-enable;
+
+				qcom,panel-roi-alignment = <540 36 540 36 540 36>;
+				qcom,partial-update-enabled = "single_roi";
 			};
 
 			timing@fhd_sdc_120 {
@@ -1221,6 +1227,9 @@
 				qcom,lm-split = <540 540>;
 				qcom,mdss-dsc-slice-height = <36>;
 				qcom,mdss-dsc-slice-width = <540>;
+
+				qcom,panel-roi-alignment = <540 36 540 36 540 36>;
+				qcom,partial-update-enabled = "single_roi";
 			};
 
 			timing@fhd_oplus_60 {
@@ -1542,6 +1551,9 @@
 				qcom,lm-split = <540 540>;
 				qcom,mdss-dsc-slice-height = <36>;
 				qcom,mdss-dsc-slice-width = <540>;
+
+				qcom,panel-roi-alignment = <540 36 540 36 540 36>;
+				qcom,partial-update-enabled = "single_roi";
 			};
 
 			timing@fhd_oplus_72 {
@@ -1863,6 +1875,9 @@
 				qcom,lm-split = <540 540>;
 				qcom,mdss-dsc-slice-height = <36>;
 				qcom,mdss-dsc-slice-width = <540>;
+
+				qcom,panel-roi-alignment = <540 36 540 36 540 36>;
+				qcom,partial-update-enabled = "single_roi";
 			};
 
 			timing@fhd_oplus_90 {
@@ -2184,6 +2199,9 @@
 				qcom,lm-split = <540 540>;
 				qcom,mdss-dsc-slice-height = <36>;
 				qcom,mdss-dsc-slice-width = <540>;
+				
+				qcom,panel-roi-alignment = <540 36 540 36 540 36>;
+				qcom,partial-update-enabled = "single_roi";
 			};
 
 			timing@fhd_oplus_120 {
@@ -2505,6 +2523,9 @@
 				qcom,lm-split = <540 540>;
 				qcom,mdss-dsc-slice-height = <36>;
 				qcom,mdss-dsc-slice-width = <540>;
+				
+				qcom,panel-roi-alignment = <540 36 540 36 540 36>;
+				qcom,partial-update-enabled = "single_roi";
 			};
 
 			timing@wqhd_sdc_60 {
@@ -2708,6 +2729,9 @@
 				qcom,lm-split = <720 720>;
 				qcom,mdss-dsc-slice-height = <24>;
 				qcom,mdss-dsc-slice-width = <720>;
+				
+				qcom,panel-roi-alignment = <720 24 720 24 720 24>;
+				qcom,partial-update-enabled = "single_roi";
 			};
 
 			timing@wqhd_sdc_90 {
@@ -3403,6 +3427,9 @@
 				qcom,mdss-dsc-bit-per-pixel = <8>;
 				qcom,mdss-dsc-scr-version = <1>;
 				qcom,mdss-dsc-block-prediction-enable;
+				
+				qcom,panel-roi-alignment = <720 24 720 24 720 24>;
+				qcom,partial-update-enabled = "single_roi";
 			};
 
 			timing@wqhd_sdc_120 {
@@ -3634,6 +3661,9 @@
 				qcom,lm-split = <720 720>;
 				qcom,mdss-dsc-slice-height = <24>;
 				qcom,mdss-dsc-slice-width = <720>;
+				
+				qcom,panel-roi-alignment = <720 24 720 24 720 24>;
+				qcom,partial-update-enabled = "single_roi";
 			};
 
 			timing@wqhd_oplus_60 {
@@ -3940,6 +3970,9 @@
 				qcom,lm-split = <720 720>;
 				qcom,mdss-dsc-slice-height = <24>;
 				qcom,mdss-dsc-slice-width = <720>;
+				
+				qcom,panel-roi-alignment = <720 24 720 24 720 24>;
+				qcom,partial-update-enabled = "single_roi";
 			};
 
 			timing@wqhd_oplus_72 {
@@ -4246,6 +4279,9 @@
 				qcom,lm-split = <720 720>;
 				qcom,mdss-dsc-slice-height = <24>;
 				qcom,mdss-dsc-slice-width = <720>;
+				
+				qcom,panel-roi-alignment = <720 24 720 24 720 24>;
+				qcom,partial-update-enabled = "single_roi";
 			};
 
 			timing@wqhd_oplus_90 {
@@ -4552,6 +4588,9 @@
 				qcom,lm-split = <720 720>;
 				qcom,mdss-dsc-slice-height = <24>;
 				qcom,mdss-dsc-slice-width = <720>;
+				
+				qcom,panel-roi-alignment = <720 24 720 24 720 24>;
+				qcom,partial-update-enabled = "single_roi";
 			};
 
 			timing@wqhd_oplus_120 {
@@ -4858,6 +4897,9 @@
 				qcom,lm-split = <720 720>;
 				qcom,mdss-dsc-slice-height = <24>;
 				qcom,mdss-dsc-slice-width = <720>;
+				
+				qcom,panel-roi-alignment = <720 24 720 24 720 24>;
+				qcom,partial-update-enabled = "single_roi";
 			};
 
 			timing@wqhd_memc_60 {
@@ -5086,6 +5128,9 @@
 				qcom,lm-split = <720 720>;
 				qcom,mdss-dsc-slice-height = <24>;
 				qcom,mdss-dsc-slice-width = <720>;
+				
+				qcom,panel-roi-alignment = <720 24 720 24 720 24>;
+				qcom,partial-update-enabled = "single_roi";
 			};
 		};
 	};
