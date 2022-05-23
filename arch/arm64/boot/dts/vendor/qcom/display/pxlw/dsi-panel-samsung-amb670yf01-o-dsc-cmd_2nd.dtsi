@@ -739,6 +739,9 @@
 				qcom,mdss-dsc-bit-per-pixel = <8>;
 				qcom,mdss-dsc-scr-version = <1>;
 				qcom,mdss-dsc-block-prediction-enable;
+
+				qcom,panel-roi-alignment = <540 36 540 36 540 36>;
+				qcom,partial-update-enabled = "single_roi";
 			};
 
 			timing@1 {
@@ -1358,6 +1361,9 @@
 				qcom,mdss-dsc-bit-per-pixel = <8>;
 				qcom,mdss-dsc-scr-version = <1>;
 				qcom,mdss-dsc-block-prediction-enable;
+
+				qcom,panel-roi-alignment = <540 36 540 36 540 36>;
+				qcom,partial-update-enabled = "single_roi";
 			};
 
 			timing@2 {
@@ -1976,6 +1982,9 @@
 				qcom,mdss-dsc-bit-per-pixel = <8>;
 				qcom,mdss-dsc-scr-version = <1>;
 				qcom,mdss-dsc-block-prediction-enable;
+
+				qcom,panel-roi-alignment = <540 36 540 36 540 36>;
+				qcom,partial-update-enabled = "single_roi";
 			};
 
 			timing@3 {
@@ -2691,6 +2700,9 @@
 				qcom,mdss-dsc-bit-per-pixel = <8>;
 				qcom,mdss-dsc-scr-version = <1>;
 				qcom,mdss-dsc-block-prediction-enable;
+
+				qcom,panel-roi-alignment = <540 36 540 36 540 36>;
+				qcom,partial-update-enabled = "single_roi";
 			};
 
 			timing@4 {
@@ -3406,6 +3418,9 @@
 				qcom,mdss-dsc-bit-per-pixel = <8>;
 				qcom,mdss-dsc-scr-version = <1>;
 				qcom,mdss-dsc-block-prediction-enable;
+
+				qcom,panel-roi-alignment = <540 36 540 36 540 36>;
+				qcom,partial-update-enabled = "single_roi";
 			};
 
 			timing@5 {
@@ -4121,6 +4136,9 @@
 				qcom,mdss-dsc-bit-per-pixel = <8>;
 				qcom,mdss-dsc-scr-version = <1>;
 				qcom,mdss-dsc-block-prediction-enable;
+
+				qcom,panel-roi-alignment = <540 36 540 36 540 36>;
+				qcom,partial-update-enabled = "single_roi";
 			};
 
 			timing@6 {
@@ -4837,6 +4855,9 @@
 				qcom,mdss-dsc-bit-per-pixel = <8>;
 				qcom,mdss-dsc-scr-version = <1>;
 				qcom,mdss-dsc-block-prediction-enable;
+
+				qcom,panel-roi-alignment = <540 36 540 36 540 36>;
+				qcom,partial-update-enabled = "single_roi";
 			};
 
 			timing@7 {
@@ -5490,6 +5511,9 @@
 				qcom,mdss-dsc-bit-per-pixel = <8>;
 				qcom,mdss-dsc-scr-version = <1>;
 				qcom,mdss-dsc-block-prediction-enable;
+
+				qcom,panel-roi-alignment = <720 24 720 24 720 24>;
+				qcom,partial-update-enabled = "single_roi";
 			};
 
 			timing@8 {
@@ -6108,6 +6132,9 @@
 				qcom,mdss-dsc-bit-per-pixel = <8>;
 				qcom,mdss-dsc-scr-version = <1>;
 				qcom,mdss-dsc-block-prediction-enable;
+
+				qcom,panel-roi-alignment = <720 24 720 24 720 24>;
+				qcom,partial-update-enabled = "single_roi";
 			};
 
 			timing@9 {
@@ -6727,6 +6754,9 @@
 				qcom,mdss-dsc-bit-per-pixel = <8>;
 				qcom,mdss-dsc-scr-version = <1>;
 				qcom,mdss-dsc-block-prediction-enable;
+
+				qcom,panel-roi-alignment = <720 24 720 24 720 24>;
+				qcom,partial-update-enabled = "single_roi";
 			};
 
 			timing@10 {
@@ -7441,6 +7471,9 @@
 				qcom,mdss-dsc-bit-per-pixel = <8>;
 				qcom,mdss-dsc-scr-version = <1>;
 				qcom,mdss-dsc-block-prediction-enable;
+
+				qcom,panel-roi-alignment = <720 24 720 24 720 24>;
+				qcom,partial-update-enabled = "single_roi";
 			};
 
 			timing@11 {
@@ -8155,6 +8188,9 @@
 				qcom,mdss-dsc-bit-per-pixel = <8>;
 				qcom,mdss-dsc-scr-version = <1>;
 				qcom,mdss-dsc-block-prediction-enable;
+
+				qcom,panel-roi-alignment = <720 24 720 24 720 24>;
+				qcom,partial-update-enabled = "single_roi";
 			};
 
 			timing@12 {
@@ -8868,6 +8904,9 @@
 				qcom,mdss-dsc-bit-per-pixel = <8>;
 				qcom,mdss-dsc-scr-version = <1>;
 				qcom,mdss-dsc-block-prediction-enable;
+
+				qcom,panel-roi-alignment = <720 24 720 24 720 24>;
+				qcom,partial-update-enabled = "single_roi";
 			};
 
 			timing@13 {
@@ -9582,6 +9621,9 @@
 				qcom,mdss-dsc-bit-per-pixel = <8>;
 				qcom,mdss-dsc-scr-version = <1>;
 				qcom,mdss-dsc-block-prediction-enable;
+
+				qcom,panel-roi-alignment = <720 24 720 24 720 24>;
+				qcom,partial-update-enabled = "single_roi";
 			};
 
 			timing@14 {
@@ -10225,6 +10267,9 @@
 				qcom,mdss-dsc-bit-per-pixel = <8>;
 				qcom,mdss-dsc-scr-version = <1>;
 				qcom,mdss-dsc-block-prediction-enable;
+
+				qcom,panel-roi-alignment = <720 24 720 24 720 24>;
+				qcom,partial-update-enabled = "single_roi";
 			};
 		};
 	};
