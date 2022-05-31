@@ -60,11 +60,7 @@
 #ifdef CONFIG_OPLUS_SHORT_C_BATT_CHECK
 static bool short_d_on = false;
 #define short_debug(fmt,...) \
-	do { \
-		if (short_d_on == true) { \
-		printk(KERN_CRIT pr_fmt("=====[OPLUS_CHG]"fmt),##__VA_ARGS__); \
-		} \
-	} while (0)
+	do { } while (0)
 
 static int short_c_battery_status = SHORT_C_BATT_STATUS__NORMAL;
 static int short_c_switch_status = SHORT_C_BATT_SW_STATUS__OFF;
