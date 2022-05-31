@@ -2635,7 +2635,7 @@ static void tfa98xx_dsp_init(struct tfa98xx *tfa98xx)
 
 			/* Subsystem ready, tfa init complete */
 			tfa98xx->dsp_init = TFA98XX_DSP_INIT_DONE;
-			dev_info(&tfa98xx->i2c->dev,
+			dev_dbg(&tfa98xx->i2c->dev,
 						"tfa_dev_start success (%d)\n",
 						tfa98xx->init_count);
 			/* cancel other pending init works */
@@ -2948,7 +2948,7 @@ enum Tfa98xx_Error tfa98xx_adsp_send_calib_values(struct tfa98xx *tfa98xx)
 		bytes[nr++] = (uint8_t)((dsp_cal_value >> 8) & 0xff);
 		bytes[nr++] = (uint8_t)(dsp_cal_value & 0xff);
 
-		dev_err(&tfa98xx->i2c->dev, "%s: cal value 0x%x\n", __func__, dsp_cal_value);
+		// dev_err(&tfa98xx->i2c->dev, "%s: cal value 0x%x\n", __func__, dsp_cal_value);
 
 		/* Receiver RDC */
 		if (value > 4000)
@@ -2966,7 +2966,7 @@ enum Tfa98xx_Error tfa98xx_adsp_send_calib_values(struct tfa98xx *tfa98xx)
 		bytes[nr++] = (uint8_t)((dsp_cal_value >> 8) & 0xff);
 		bytes[nr++] = (uint8_t)(dsp_cal_value & 0xff);
 
-		dev_err(&tfa98xx->i2c->dev, "%s: cal value 0x%x\n", __func__, dsp_cal_value);
+		// dev_err(&tfa98xx->i2c->dev, "%s: cal value 0x%x\n", __func__, dsp_cal_value);
 
 		/* Speaker RDC */
 		if (value > 4000)
@@ -3038,7 +3038,7 @@ int tfa98xx_keyreg_print(struct tfa98xx *tfa98xx)
               return -EIO;
        }
 
-       dev_err(&tfa98xx->i2c->dev, "[00h:0x%x],[10h:0x%x],[11h:0x%x],[13h:0x%x],[14h:0x%x],[6eh:0x%x],\n",
+       dev_dbg(&tfa98xx->i2c->dev, "[00h:0x%x],[10h:0x%x],[11h:0x%x],[13h:0x%x],[14h:0x%x],[6eh:0x%x],\n",
               SYS_CONTROL0, STATUS_FLAGS0, STATUS_FLAGS1, STATUS_FLAGS3,STATUS_FLAGS4, STATUS_FLAGS5);
        return 0;
 
@@ -3050,7 +3050,7 @@ static int tfa98xx_mute(struct snd_soc_dai *dai, int mute, int stream)
 	struct snd_soc_component *component = dai->component;
 	struct tfa98xx *tfa98xx = snd_soc_component_get_drvdata(component);
 
-	dev_info(&tfa98xx->i2c->dev, "%s: state: %d, stream %d\n", __func__, mute, stream);
+	dev_dbg(&tfa98xx->i2c->dev, "%s: state: %d, stream %d\n", __func__, mute, stream);
 
 	if (no_start) {
 		pr_info("no_start parameter set no tfa_dev_start or tfa_dev_stop, returning\n");
