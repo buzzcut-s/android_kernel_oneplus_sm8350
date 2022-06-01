@@ -5232,11 +5232,6 @@ void esd_handle_switch(struct esd_information *esd_info, bool on)
 
 static void tp_pm_qos_prepare(struct touchpanel_data *ts)
 {
-	if(pm_qos_request_active(&ts->pm_touch_req))
-		pm_qos_remove_request(&ts->pm_touch_req);
-	if(pm_qos_request_active(&ts->pm_i2c_req))
-		pm_qos_remove_request(&ts->pm_i2c_req);
-
 	ts->pm_i2c_req.type = PM_QOS_REQ_AFFINE_IRQ;
 	ts->pm_i2c_req.irq = geni_i2c_get_adap_irq(ts->client);
 	irq_set_perf_affinity(ts->pm_i2c_req.irq, IRQF_PERF_AFFINE);
@@ -5516,6 +5511,13 @@ static enum hrtimer_restart ts_get_temperature_timeout(struct hrtimer *timer)
 	schedule_work(&ts->get_temperature_work);
 
 	return HRTIMER_NORESTART;
+}
+
+static void tp_free_irq(struct touchpanel_data *ts)
+{
+	pm_qos_remove_request(&ts->pm_touch_req);
+	pm_qos_remove_request(&ts->pm_i2c_req);
+	free_irq(ts->irq, ts);
 }
 
 int register_common_touch_device(struct touchpanel_data *pdata)
@@ -5846,7 +5848,7 @@ int register_common_touch_device(struct touchpanel_data *pdata)
 	kfree(ts->earsense_delta);
 
  threaded_irq_free:
-	free_irq(ts->irq, ts);
+	tp_free_irq(ts);
 
  manu_info_alloc_err:
 	kfree(ts->panel_data.manufacture_info.version);
@@ -5861,7 +5863,7 @@ int register_common_touch_device(struct touchpanel_data *pdata)
 
  err_check_functionality_failed:
 	if (likely(ts->int_mode == UNBANNABLE)) {
-		free_irq(ts->irq, ts);
+		tp_free_irq(ts);
 	}
 	//ts->ts_ops->power_control(ts->chip_data, false);
 
@@ -6030,7 +6032,7 @@ static void tp_resume(struct device *dev)
 		goto NO_NEED_RESUME;
 
 	//free irq at first
-	free_irq(ts->irq, ts);
+	tp_free_irq(ts);
 
 	if (ts->ts_ops->reinit_device) {
 		ts->ts_ops->reinit_device(ts->chip_data);
