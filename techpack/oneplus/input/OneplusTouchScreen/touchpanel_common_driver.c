@@ -860,7 +860,7 @@ static void tp_work_func(struct touchpanel_data *ts)
 			tp_touch_handle(ts);
 		}
 		if (CHK_BIT(cur_event, IRQ_DATA_LOGGER)) {
-			if (ts->int_mode == UNBANNABLE) {
+			if (likely(ts->int_mode == UNBANNABLE)) {
 				tp_healthreport_handle(ts);
 			} else {
 				tp_datalogger_handle(ts);
@@ -922,7 +922,7 @@ static void tp_fw_update_work(struct work_struct *work)
 	TPD_INFO("%s: fw_name = %s\n", __func__, ts->panel_data.fw_name);
 
 	mutex_lock(&ts->mutex);
-	if (ts->int_mode == BANNABLE) {
+	if (unlikely(ts->int_mode == BANNABLE)) {
 		disable_irq_nosync(ts->irq);
 	}
 	ts->loading_fw = true;
@@ -1020,7 +1020,7 @@ static void tp_fw_update_work(struct work_struct *work)
 
 	kfree(fw_name_fae);
 	fw_name_fae = NULL;
-	if (ts->int_mode == BANNABLE) {
+	if (unlikely(ts->int_mode == BANNABLE)) {
 		enable_irq(ts->irq);
 	}
 	mutex_unlock(&ts->mutex);
@@ -1053,7 +1053,7 @@ static irqreturn_t tp_irq_thread_fn(int irq, void *dev_id)
 	pm_qos_update_request(&ts->pm_i2c_req, 100);
 	pm_wakeup_event(&ts->client->dev, MSEC_PER_SEC);
 
-	if (ts->int_mode == BANNABLE) {
+	if (unlikely(ts->int_mode == BANNABLE)) {
 		pr_info("[tpirq] tp_irq_thread_fn: BANNABLE");
 		mutex_lock(&ts->mutex);
 		tp_work_func(ts);
@@ -3212,7 +3212,7 @@ static int tp_baseline_debug_read_func(struct seq_file *s, void *v)
 		return 0;
 	}
 
-	if (ts->int_mode == BANNABLE) {
+	if (unlikely(ts->int_mode == BANNABLE)) {
 		disable_irq_nosync(ts->irq);
 	}
 	mutex_lock(&ts->mutex);
@@ -3232,7 +3232,7 @@ static int tp_baseline_debug_read_func(struct seq_file *s, void *v)
 
 	mutex_unlock(&ts->mutex);
 
-	if (ts->int_mode == BANNABLE) {
+	if (unlikely(ts->int_mode == BANNABLE)) {
 		enable_irq(ts->irq);
 	}
 	return 0;
@@ -3272,13 +3272,13 @@ static int tp_delta_debug_read_func(struct seq_file *s, void *v)
 		return 0;
 	}
 
-	if (ts->int_mode == BANNABLE) {
+	if (unlikely(ts->int_mode == BANNABLE)) {
 		disable_irq_nosync(ts->irq);
 	}
 	mutex_lock(&ts->mutex);
 	debug_info_ops->delta_read(s, ts->chip_data);
 	mutex_unlock(&ts->mutex);
-	if (ts->int_mode == BANNABLE) {
+	if (unlikely(ts->int_mode == BANNABLE)) {
 		enable_irq(ts->irq);
 	}
 	return 0;
@@ -3317,13 +3317,13 @@ static int tp_self_delta_debug_read_func(struct seq_file *s, void *v)
 		return 0;
 	}
 
-	if (ts->int_mode == BANNABLE) {
+	if (unlikely(ts->int_mode == BANNABLE)) {
 		disable_irq_nosync(ts->irq);
 	}
 	mutex_lock(&ts->mutex);
 	debug_info_ops->self_delta_read(s, ts->chip_data);
 	mutex_unlock(&ts->mutex);
-	if (ts->int_mode == BANNABLE) {
+	if (unlikely(ts->int_mode == BANNABLE)) {
 		enable_irq(ts->irq);
 	}
 	return 0;
@@ -3362,13 +3362,13 @@ static int tp_self_raw_debug_read_func(struct seq_file *s, void *v)
 		return 0;
 	}
 
-	if (ts->int_mode == BANNABLE) {
+	if (unlikely(ts->int_mode == BANNABLE)) {
 		disable_irq_nosync(ts->irq);
 	}
 	mutex_lock(&ts->mutex);
 	debug_info_ops->self_raw_read(s, ts->chip_data);
 	mutex_unlock(&ts->mutex);
-	if (ts->int_mode == BANNABLE) {
+	if (unlikely(ts->int_mode == BANNABLE)) {
 		enable_irq(ts->irq);
 	}
 	return 0;
@@ -3407,7 +3407,7 @@ static int tp_main_register_read_func(struct seq_file *s, void *v)
 		return 0;
 	}
 
-	if (ts->int_mode == BANNABLE) {
+	if (unlikely(ts->int_mode == BANNABLE)) {
 		disable_irq_nosync(ts->irq);
 	}
 	mutex_lock(&ts->mutex);
@@ -3415,7 +3415,7 @@ static int tp_main_register_read_func(struct seq_file *s, void *v)
 	seq_printf(s, "touch_count:%d\n", ts->touch_count);
 	debug_info_ops->main_register_read(s, ts->chip_data);
 	mutex_unlock(&ts->mutex);
-	if (ts->int_mode == BANNABLE) {
+	if (unlikely(ts->int_mode == BANNABLE)) {
 		enable_irq(ts->irq);
 	}
 	return 0;
@@ -3454,14 +3454,14 @@ static int tp_reserve_read_func(struct seq_file *s, void *v)
 		return 0;
 	}
 
-	if (ts->int_mode == BANNABLE) {
+	if (unlikely(ts->int_mode == BANNABLE)) {
 		disable_irq_nosync(ts->irq);
 	}
 	mutex_lock(&ts->mutex);
 	debug_info_ops->reserve_read(s, ts->chip_data);
 	mutex_unlock(&ts->mutex);
 
-	if (ts->int_mode == BANNABLE) {
+	if (unlikely(ts->int_mode == BANNABLE)) {
 		enable_irq(ts->irq);
 	}
 	return 0;
@@ -3532,14 +3532,14 @@ static int tp_abs_doze_read_func(struct seq_file *s, void *v)
 		return 0;
 	}
 
-	if (ts->int_mode == BANNABLE) {
+	if (unlikely(ts->int_mode == BANNABLE)) {
 		disable_irq_nosync(ts->irq);
 	}
 	mutex_lock(&ts->mutex);
 	debug_info_ops->abs_doze_read(s, ts->chip_data);
 	mutex_unlock(&ts->mutex);
 
-	if (ts->int_mode == BANNABLE) {
+	if (unlikely(ts->int_mode == BANNABLE)) {
 		enable_irq(ts->irq);
 	}
 	return 0;
@@ -5610,7 +5610,7 @@ int register_common_touch_device(struct touchpanel_data *pdata)
 		goto err_check_functionality_failed;
 	}
 
-	if (ts->int_mode == UNBANNABLE) {
+	if (likely(ts->int_mode == UNBANNABLE)) {
 		ret = tp_register_irq_func(ts);
 		if (ret < 0) {
 			goto free_touch_panel_input;
@@ -5683,7 +5683,7 @@ int register_common_touch_device(struct touchpanel_data *pdata)
 	}
 
 	//step13 : irq request setting
-	if (ts->int_mode == BANNABLE) {
+	if (unlikely(ts->int_mode == BANNABLE)) {
 		ret = tp_register_irq_func(ts);
 		if (ret < 0) {
 			goto manu_info_alloc_err;
@@ -5823,7 +5823,7 @@ int register_common_touch_device(struct touchpanel_data *pdata)
 	ts->corner_delay_up = -1;
 	ts->dead_zone_l = 15;
 	ts->dead_zone_p = 15;
-	if (ts->int_mode == UNBANNABLE) {
+	if (likely(ts->int_mode == UNBANNABLE)) {
 		ts->lcd_refresh_rate = 90;
 		ts->dead_zone_l = 25;
 		ts->dead_zone_p = 25;
@@ -5861,7 +5861,7 @@ int register_common_touch_device(struct touchpanel_data *pdata)
 	input_unregister_device(ps_input_dev);
 
  err_check_functionality_failed:
-	if (ts->int_mode == UNBANNABLE) {
+	if (likely(ts->int_mode == UNBANNABLE)) {
 		tp_free_irq(ts);
 	}
 	//ts->ts_ops->power_control(ts->chip_data, false);
@@ -5976,7 +5976,7 @@ static int tp_suspend(struct device *dev)
 	//step6:gesture mode status process
 	if (ts->black_gesture_support) {
 		if (ts->gesture_enable == 1) {
-			if (ts->int_mode == UNBANNABLE) {	//workaroud for config fail when suspend for 19805
+			if (likely(ts->int_mode == UNBANNABLE)) {	//workaroud for config fail when suspend for 19805
 				msleep(20);
 			}
 			ts->ts_ops->mode_switch(ts->chip_data, MODE_TOUCH_HOLD, false);	//suspend, close touchhold function.
@@ -6076,7 +6076,7 @@ static void speedup_resume(struct work_struct *work)
 	tp_btnkey_release(ts);
 	tp_touch_release(ts);
 
-	if (ts->int_mode == UNBANNABLE) {
+	if (likely(ts->int_mode == UNBANNABLE)) {
 		if (!ts->gesture_enable) {
 			ts->ts_ops->power_control(ts->chip_data, 1);
 			TPD_INFO("before irq register, power on\n");
@@ -6128,7 +6128,7 @@ static void speedup_resume(struct work_struct *work)
 		esd_handle_switch(&ts->esd_info, true);
 	}
 	//step6:Request irq again
-	if (ts->int_mode == BANNABLE) {
+	if (unlikely(ts->int_mode == BANNABLE)) {
 		tp_register_irq_func(ts);
 	}
 
@@ -6182,7 +6182,7 @@ static int tfb_notifier_callback(struct notifier_block *self, unsigned long even
 					}
 					tp_suspend(ts->dev);
 					if (!ts->gesture_enable) {
-						if (ts->int_mode == UNBANNABLE)
+						if (likely(ts->int_mode == UNBANNABLE))
 							ts->ts_ops->power_control(ts->chip_data, 0);
 						ts->i2c_ready = false;
 					}
