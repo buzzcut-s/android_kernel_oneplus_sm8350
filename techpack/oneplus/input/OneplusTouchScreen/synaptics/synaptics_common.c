@@ -445,7 +445,7 @@ static int tp_auto_test_read_func(struct seq_file *s, void *v)
 		return 0;
 	}
 	//step1:disable_irq && get mutex locked
-	if (ts->int_mode == BANNABLE) {
+	if (unlikely(ts->int_mode == BANNABLE)) {
 		disable_irq_nosync(ts->irq);
 	}
 	mutex_lock(&ts->mutex);
@@ -473,7 +473,7 @@ static int tp_auto_test_read_func(struct seq_file *s, void *v)
 		TPD_INFO("Request firmware failed - %s (%d)\n", ts->panel_data.test_limit_name, ret);
 		seq_printf(s, "No limit IMG\n");
 		mutex_unlock(&ts->mutex);
-		if (ts->int_mode == BANNABLE) {
+		if (unlikely(ts->int_mode == BANNABLE)) {
 			enable_irq(ts->irq);
 		}
 		return 0;
@@ -511,7 +511,7 @@ static int tp_auto_test_read_func(struct seq_file *s, void *v)
 
 	//step7: unlock the mutex && enable irq trigger
 	mutex_unlock(&ts->mutex);
-	if (ts->int_mode == BANNABLE) {
+	if (unlikely(ts->int_mode == BANNABLE)) {
 		enable_irq(ts->irq);
 	}
 
@@ -678,7 +678,7 @@ static int tp_DRT_read_func(struct seq_file *s, void *v)
 		seq_printf(s, "In suspend state, and gesture not enable\n");
 		return 0;
 	}
-	if (ts->int_mode == BANNABLE) {
+	if (unlikely(ts->int_mode == BANNABLE)) {
 		disable_irq_nosync(ts->irq);
 	}
 
@@ -686,7 +686,7 @@ static int tp_DRT_read_func(struct seq_file *s, void *v)
 	debug_info_ops->DRT(s, ts->chip_data);
 	mutex_unlock(&ts->mutex);
 
-	if (ts->int_mode == BANNABLE) {
+	if (unlikely(ts->int_mode == BANNABLE)) {
 		enable_irq(ts->client->irq);
 	}
 	return 0;
