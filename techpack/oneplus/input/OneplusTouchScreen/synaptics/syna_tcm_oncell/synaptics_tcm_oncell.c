@@ -4583,6 +4583,7 @@ static int syna_tcm_probe(struct i2c_client *client, const struct i2c_device_id 
 	struct syna_tcm_data *tcm_info = NULL;
 	struct touchpanel_data *ts = NULL;
 	struct device_hcd *device_hcd = NULL;
+	int pm_i2c_req_irq, pm_touch_req_irq;
 
 	TPD_INFO("%s: enter\n", __func__);
 
@@ -4681,6 +4682,10 @@ static int syna_tcm_probe(struct i2c_client *client, const struct i2c_device_id 
 	INIT_BUFFER(tcm_info->test_hcd->test_out, false);
 
 	//9. register common part of touchpanel driver
+	pm_i2c_req_irq = geni_i2c_get_adap_irq(client);
+	pm_touch_req_irq = client->irq;
+	printk("[tsirq] pm_i2c_req_irq: %d", pm_i2c_req_irq);
+	printk("[tsirq] pm_touch_req_irq: %d", pm_touch_req_irq);
 	retval = register_common_touch_device(ts);
 	if (retval < 0 && (retval != -EFTM)) {
 		TPD_INFO("Failed to init device information\n");
@@ -4702,22 +4707,9 @@ static int syna_tcm_probe(struct i2c_client *client, const struct i2c_device_id 
 	}
 	g_tcm_info = tcm_info;
 
-	ts->pm_i2c_req.type = PM_QOS_REQ_AFFINE_IRQ;
-	ts->pm_i2c_req.irq = geni_i2c_get_adap_irq(client);
-	irq_set_perf_affinity(ts->pm_i2c_req.irq, IRQF_PERF_AFFINE);
-	pm_qos_add_request(&ts->pm_i2c_req, PM_QOS_CPU_DMA_LATENCY,
-			PM_QOS_DEFAULT_VALUE);
-
-	ts->pm_touch_req.type = PM_QOS_REQ_AFFINE_IRQ;
-	ts->pm_touch_req.irq = client->irq;
-	pm_qos_add_request(&ts->pm_touch_req, PM_QOS_CPU_DMA_LATENCY,
-			PM_QOS_DEFAULT_VALUE);
-
 	return 0;
 
  err_register_driver:
-	pm_qos_remove_request(&ts->pm_touch_req);
-	pm_qos_remove_request(&ts->pm_i2c_req);
 
 	if (tcm_info->test_hcd) {
 		kfree(tcm_info->test_hcd);

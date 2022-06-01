@@ -16,6 +16,7 @@
 #include <linux/oem/boot_mode.h>
 #include <linux/iio/consumer.h>
 #include <linux/alarmtimer.h>
+ #include <linux/i2c-msm-geni.h>
 
 #ifndef TPD_USE_EINT
 #include <linux/hrtimer.h>
@@ -5237,9 +5238,26 @@ int tp_register_irq_func(struct touchpanel_data *ts)
 
 #ifdef TPD_USE_EINT
 	if (gpio_is_valid(ts->hw_res.irq_gpio)) {
+
+		ts->pm_i2c_req.type = PM_QOS_REQ_AFFINE_IRQ;
+		ts->pm_i2c_req.irq = geni_i2c_get_adap_irq(ts->client);
+		irq_set_perf_affinity(ts->pm_i2c_req.irq, IRQF_PERF_AFFINE);
+		pm_qos_add_request(&ts->pm_i2c_req, PM_QOS_CPU_DMA_LATENCY,
+				PM_QOS_DEFAULT_VALUE);
+
+		ts->pm_touch_req.type = PM_QOS_REQ_AFFINE_IRQ;
+		ts->pm_touch_req.irq = ts->client->irq;
+		pm_qos_add_request(&ts->pm_touch_req, PM_QOS_CPU_DMA_LATENCY,
+				PM_QOS_DEFAULT_VALUE);
+
+		printk("[tsirq] ts->pm_i2c_req.irq: %d", ts->pm_i2c_req.irq);
+		printk("[tsirq] ts->pm_touch_req.irq: %d", ts->pm_touch_req.irq);
+
 		TPD_DEBUG("%s, irq_gpio is %d, ts->irq is %d\n", __func__, ts->hw_res.irq_gpio, ts->irq);
 		ret = request_threaded_irq(ts->irq, NULL, tp_irq_thread_fn, ts->irq_flags | IRQF_ONESHOT | IRQF_PERF_AFFINE, TPD_DEVICE, ts);
 		if (ret < 0) {
+			pm_qos_remove_request(&ts->pm_touch_req);
+			pm_qos_remove_request(&ts->pm_i2c_req);
 			TPD_INFO("%s request_threaded_irq ret is %d\n", __func__, ret);
 		}
 	} else {
