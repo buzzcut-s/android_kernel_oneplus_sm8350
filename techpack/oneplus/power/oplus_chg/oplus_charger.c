@@ -629,10 +629,8 @@ int oplus_battery_set_property(struct power_supply *psy,
 #endif /* CONFIG_OPLUS_CHG_GKI_SUPPORT */
 
 
-#define OPLUS_MIDAS_CHG_DEBUG 0
 #ifdef OPLUS_MIDAS_CHG_DEBUG
-#define	midas_debug(fmt, args...)	\
-	pr_notice("[OPLUS_MIDAS_CHG_DEBUG]" fmt, ##args)
+#define	midas_debug(fmt, args...)
 #else
 #define	midas_debug(fmt, args...)
 #endif /* OPLUS_MIDAS_CHG_DEBUG */
