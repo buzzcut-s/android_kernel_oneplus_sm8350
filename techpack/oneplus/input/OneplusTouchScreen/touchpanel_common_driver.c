@@ -5232,6 +5232,11 @@ void esd_handle_switch(struct esd_information *esd_info, bool on)
 
 static void tp_pm_qos_prepare(struct touchpanel_data *ts)
 {
+	if(pm_qos_request_active(&ts->pm_touch_req))
+		pm_qos_remove_request(&ts->pm_touch_req);
+	if(pm_qos_request_active(&ts->pm_i2c_req))
+		pm_qos_remove_request(&ts->pm_i2c_req);
+
 	ts->pm_i2c_req.type = PM_QOS_REQ_AFFINE_IRQ;
 	ts->pm_i2c_req.irq = geni_i2c_get_adap_irq(ts->client);
 	irq_set_perf_affinity(ts->pm_i2c_req.irq, IRQF_PERF_AFFINE);
@@ -5253,7 +5258,7 @@ int tp_register_irq_func(struct touchpanel_data *ts)
 
 		tp_pm_qos_prepare(ts);
 
-		pr_info("[tpirq] tp_register_irq_func: irq_gpio is %d, ts->irq is %d\n", ts->hw_res.irq_gpio, ts->irq);
+		TPD_DEBUG("%s, irq_gpio is %d, ts->irq is %d\n", __func__, ts->hw_res.irq_gpio, ts->irq);
 		ret = request_threaded_irq(ts->irq, NULL, tp_irq_thread_fn, ts->irq_flags | IRQF_ONESHOT | IRQF_PERF_AFFINE, TPD_DEVICE, ts);
 		if (ret < 0) {
 			pm_qos_remove_request(&ts->pm_touch_req);
@@ -5261,7 +5266,7 @@ int tp_register_irq_func(struct touchpanel_data *ts)
 			TPD_INFO("%s request_threaded_irq ret is %d\n", __func__, ret);
 		}
 	} else {
-		pr_info("[tpirq]: tp_register_irq_func: no valid irq\n");
+		TPD_INFO("%s:no valid irq\n", __func__);
 	}
 #else
 	hrtimer_init(&ts->timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
@@ -6025,7 +6030,7 @@ static void tp_resume(struct device *dev)
 		goto NO_NEED_RESUME;
 
 	//free irq at first
-	//free_irq(ts->irq, ts);
+	free_irq(ts->irq, ts);
 
 	if (ts->ts_ops->reinit_device) {
 		ts->ts_ops->reinit_device(ts->chip_data);
@@ -6076,7 +6081,7 @@ static void speedup_resume(struct work_struct *work)
 			TPD_INFO("before irq register, power on\n");
 			ts->i2c_ready = true;
 		}
-		//tp_register_irq_func(ts);
+		tp_register_irq_func(ts);
 	}
 	//if (ts->use_resume_notify && (!ts->fp_info.touch_state)) {
 	//      reinit_completion(&ts->resume_complete);
@@ -6122,9 +6127,9 @@ static void speedup_resume(struct work_struct *work)
 		esd_handle_switch(&ts->esd_info, true);
 	}
 	//step6:Request irq again
-	//if (unlikely(ts->int_mode == BANNABLE)) {
-	//	tp_register_irq_func(ts);
-	//}
+	if (unlikely(ts->int_mode == BANNABLE)) {
+		tp_register_irq_func(ts);
+	}
 
 	ts->suspend_state = TP_SPEEDUP_RESUME_COMPLETE;
 	if (ts->temperature_detect_support)
