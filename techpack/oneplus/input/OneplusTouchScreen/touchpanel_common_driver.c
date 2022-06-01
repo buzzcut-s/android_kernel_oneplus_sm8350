@@ -5229,6 +5229,25 @@ void esd_handle_switch(struct esd_information *esd_info, bool on)
 	mutex_unlock(&esd_info->esd_lock);
 }
 
+static void tp_pm_qos_prepare(struct touchpanel_data *ts)
+{
+	if(pm_qos_request_active(&ts->pm_touch_req))
+		pm_qos_remove_request(&ts->pm_touch_req);
+	if(pm_qos_request_active(&ts->pm_i2c_req))
+		pm_qos_remove_request(&ts->pm_i2c_req);
+
+	ts->pm_i2c_req.type = PM_QOS_REQ_AFFINE_IRQ;
+	ts->pm_i2c_req.irq = geni_i2c_get_adap_irq(ts->client);
+	irq_set_perf_affinity(ts->pm_i2c_req.irq, IRQF_PERF_AFFINE);
+	pm_qos_add_request(&ts->pm_i2c_req, PM_QOS_CPU_DMA_LATENCY,
+			PM_QOS_DEFAULT_VALUE);
+
+	ts->pm_touch_req.type = PM_QOS_REQ_AFFINE_IRQ;
+	ts->pm_touch_req.irq = ts->client->irq;
+	pm_qos_add_request(&ts->pm_touch_req, PM_QOS_CPU_DMA_LATENCY,
+			PM_QOS_DEFAULT_VALUE);
+}
+
 int tp_register_irq_func(struct touchpanel_data *ts)
 {
 	int ret = 0;
@@ -5236,19 +5255,7 @@ int tp_register_irq_func(struct touchpanel_data *ts)
 #ifdef TPD_USE_EINT
 	if (gpio_is_valid(ts->hw_res.irq_gpio)) {
 
-		ts->pm_i2c_req.type = PM_QOS_REQ_AFFINE_IRQ;
-		ts->pm_i2c_req.irq = geni_i2c_get_adap_irq(ts->client);
-		irq_set_perf_affinity(ts->pm_i2c_req.irq, IRQF_PERF_AFFINE);
-		pm_qos_add_request(&ts->pm_i2c_req, PM_QOS_CPU_DMA_LATENCY,
-				PM_QOS_DEFAULT_VALUE);
-
-		ts->pm_touch_req.type = PM_QOS_REQ_AFFINE_IRQ;
-		ts->pm_touch_req.irq = ts->client->irq;
-		pm_qos_add_request(&ts->pm_touch_req, PM_QOS_CPU_DMA_LATENCY,
-				PM_QOS_DEFAULT_VALUE);
-
-		printk("[tsirq] ts->pm_i2c_req.irq: %d", ts->pm_i2c_req.irq);
-		printk("[tsirq] ts->pm_touch_req.irq: %d", ts->pm_touch_req.irq);
+		tp_pm_qos_prepare(ts);
 
 		TPD_DEBUG("%s, irq_gpio is %d, ts->irq is %d\n", __func__, ts->hw_res.irq_gpio, ts->irq);
 		ret = request_threaded_irq(ts->irq, NULL, tp_irq_thread_fn, ts->irq_flags | IRQF_ONESHOT | IRQF_PERF_AFFINE, TPD_DEVICE, ts);

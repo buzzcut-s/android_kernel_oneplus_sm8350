@@ -4583,7 +4583,6 @@ static int syna_tcm_probe(struct i2c_client *client, const struct i2c_device_id 
 	struct syna_tcm_data *tcm_info = NULL;
 	struct touchpanel_data *ts = NULL;
 	struct device_hcd *device_hcd = NULL;
-	int pm_i2c_req_irq, pm_touch_req_irq;
 
 	TPD_INFO("%s: enter\n", __func__);
 
@@ -4682,10 +4681,6 @@ static int syna_tcm_probe(struct i2c_client *client, const struct i2c_device_id 
 	INIT_BUFFER(tcm_info->test_hcd->test_out, false);
 
 	//9. register common part of touchpanel driver
-	pm_i2c_req_irq = geni_i2c_get_adap_irq(client);
-	pm_touch_req_irq = client->irq;
-	printk("[tsirq] pm_i2c_req_irq: %d", pm_i2c_req_irq);
-	printk("[tsirq] pm_touch_req_irq: %d", pm_touch_req_irq);
 	retval = register_common_touch_device(ts);
 	if (retval < 0 && (retval != -EFTM)) {
 		TPD_INFO("Failed to init device information\n");
