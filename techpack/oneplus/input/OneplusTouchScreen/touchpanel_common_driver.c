@@ -1054,6 +1054,7 @@ static irqreturn_t tp_irq_thread_fn(int irq, void *dev_id)
 	pm_wakeup_event(&ts->client->dev, MSEC_PER_SEC);
 
 	if (ts->int_mode == BANNABLE) {
+		pr_info("[tpirq] tp_irq_thread_fn: BANNABLE");
 		mutex_lock(&ts->mutex);
 		tp_work_func(ts);
 		mutex_unlock(&ts->mutex);
