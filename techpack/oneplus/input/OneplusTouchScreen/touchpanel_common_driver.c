@@ -1054,11 +1054,9 @@ static irqreturn_t tp_irq_thread_fn(int irq, void *dev_id)
 	pm_wakeup_event(&ts->client->dev, MSEC_PER_SEC);
 
 	if (ts->int_mode == BANNABLE) {
-		__pm_stay_awake(&ts->source);	//avoid system enter suspend lead to i2c error
 		mutex_lock(&ts->mutex);
 		tp_work_func(ts);
 		mutex_unlock(&ts->mutex);
-		__pm_relax(&ts->source);
 	} else {
 		tp_work_func_unlock(ts);
 	}
@@ -1387,11 +1385,10 @@ static ssize_t proc_gesture_switch_write(struct file *file, const char __user * 
 
 	TPD_DEBUG("%s: gesture_switch value= %d\n", __func__, value);
 	if ((ts->is_suspended == 1) && (ts->gesture_enable == 1)) {
-		__pm_stay_awake(&ts->source);	//avoid system enter suspend lead to i2c error
+		pm_wakeup_event(&ts->client->dev, MSEC_PER_SEC);
 		mutex_lock(&ts->mutex);
 		ts->ts_ops->mode_switch(ts->chip_data, MODE_GESTURE_SWITCH, ts->gesture_switch);
 		mutex_unlock(&ts->mutex);
-		__pm_relax(&ts->source);
 	} else {
 		TPD_INFO("%s: gesture mode switch must be suspend.\n", __func__);
 	}
@@ -5684,7 +5681,6 @@ int register_common_touch_device(struct touchpanel_data *pdata)
 		goto manu_info_alloc_err;
 	}
 
-	wakeup_source_add(&ts->source);
 	//step13 : irq request setting
 	if (ts->int_mode == BANNABLE) {
 		ret = tp_register_irq_func(ts);
