@@ -181,7 +181,7 @@ static void oplus_warp_set_awake(struct oplus_warp_chip *chip, bool awake)
 	}
 	if (awake && !pm_flag) {
 		pm_flag = true;
-		__pm_stay_awake(chip->warp_ws);
+		__pm_wakeup_event(chip->warp_ws, MSEC_PER_SEC);
 	} else if (!awake && pm_flag) {
 		__pm_relax(chip->warp_ws);
 		pm_flag = false;
