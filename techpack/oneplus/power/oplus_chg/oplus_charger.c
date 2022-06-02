@@ -2173,7 +2173,7 @@ static void oplus_chg_set_awake(struct oplus_chg_chip *chip, bool awake)
 
 	if (awake && !pm_flag) {
 		pm_flag = true;
-		__pm_stay_awake(chip->suspend_ws);
+		__pm_wakeup_event(chip->suspend_ws, MSEC_PER_SEC);
 	} else if (!awake && pm_flag) {
 		__pm_relax(chip->suspend_ws);
 		pm_flag = false;

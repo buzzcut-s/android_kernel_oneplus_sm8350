@@ -51,7 +51,7 @@ static void oplus_adapter_set_awake(struct oplus_adapter_chip *chip, bool awake)
 
 	if (awake && !pm_flag) {
 		pm_flag = true;
-		__pm_stay_awake(chip->adapter_ws);
+		__pm_wakeup_event(chip->adapter_ws, MSEC_PER_SEC);
 	} else if (!awake && pm_flag) {
 		__pm_relax(chip->adapter_ws);
 		pm_flag = false;
