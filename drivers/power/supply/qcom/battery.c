@@ -1678,7 +1678,7 @@ static int pl_awake_vote_callback(struct votable *votable,
 	struct pl_data *chip = data;
 
 	if (awake)
-		__pm_stay_awake(chip->pl_ws);
+		__pm_wakeup_event(chip->pl_ws, MSEC_PER_SEC);
 	else
 		__pm_relax(chip->pl_ws);
 
