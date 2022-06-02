@@ -474,7 +474,7 @@ static void aw8697_ram_loaded(const struct firmware *cont, void *context)
     #ifdef AWINIC_READ_BIN_FLEXBALLY
     if(load_count <=20)
     {
-       schedule_delayed_work(&aw8697->ram_work, msecs_to_jiffies(ram_timer_val));
+       queue_delayed_work(system_power_efficient_wq, &aw8697->ram_work, msecs_to_jiffies(ram_timer_val));
        pr_debug("%s:start hrtimer:load_count%d\n", __func__, load_count);
     }
     #endif
@@ -562,7 +562,7 @@ static int aw8697_ram_init(struct aw8697 *aw8697)
     aw8697->haptic_real_f0 = AW8697_HAPTIC_F0_PRE/10;
 
     INIT_DELAYED_WORK(&aw8697->ram_work, aw8697_ram_work_routine);
-    schedule_delayed_work(&aw8697->ram_work, msecs_to_jiffies(ram_timer_val));
+    queue_delayed_work(system_power_efficient_wq, &aw8697->ram_work, msecs_to_jiffies(ram_timer_val));
 #else
     aw8697_ram_update(aw8697);
 #endif
