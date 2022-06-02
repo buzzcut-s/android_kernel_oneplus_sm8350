@@ -1204,7 +1204,7 @@ static int op10_driver_probe(struct i2c_client *client, const struct i2c_device_
 	the_chip = chip;
 #ifdef OPLUS_CHG_OP_DEF
 	oplus_chg_asic_register(asic);
-	schedule_delayed_work(&chip->asic_init_work, 0);
+	queue_delayed_work(system_power_efficient_wq, &chip->asic_init_work, 0);
 #endif
 	chg_debug("op10 success\n");
 	return 0;

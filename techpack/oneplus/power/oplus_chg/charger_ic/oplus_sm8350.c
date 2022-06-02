@@ -453,7 +453,7 @@ static void oplus_otg_status_check_work(struct work_struct *work)
 		return;
 	}
 
-	schedule_delayed_work(&bcdev->otg_status_check_work, msecs_to_jiffies(1000));
+	queue_delayed_work(system_power_efficient_wq, &bcdev->otg_status_check_work, msecs_to_jiffies(1000));
 }
 
 static int oplus_chg_get_real_soc(struct battery_chg_dev *bcdev, int *soc)
@@ -886,10 +886,10 @@ static int __oplus_connector_check_temp(struct battery_chg_dev *bcdev)
 	}
 
 	if (bcdev->connector_temp < 33)
-		schedule_delayed_work(&bcdev->connector_check_work, msecs_to_jiffies(300));
+		queue_delayed_work(system_power_efficient_wq, &bcdev->connector_check_work, msecs_to_jiffies(300));
 	else if ((bcdev->connector_temp >= 33) && (bcdev->connector_temp < 60))
 		/*time need optimize depend on test*/
-		schedule_delayed_work(&bcdev->connector_check_work, msecs_to_jiffies(50));
+		queue_delayed_work(system_power_efficient_wq, &bcdev->connector_check_work, msecs_to_jiffies(50));
 	else
 		pr_debug("connector_temp:%d\n", bcdev->connector_temp);
 
@@ -968,7 +968,7 @@ static void oplus_connector_recovery_charge_work(struct work_struct *work)
 		return;
 	}
 
-	schedule_delayed_work(&bcdev->connector_recovery_work,
+	queue_delayed_work(system_power_efficient_wq, &bcdev->connector_recovery_work,
 		msecs_to_jiffies(connector_RECOVERY_CHECK_INTERVAL));
 }
 
@@ -1053,7 +1053,7 @@ static void oplus_disconnect_vbus(bool enable)
 
 	/* Charge recovery monitor */
 
-	schedule_delayed_work(&bcdev->connector_recovery_work,
+	queue_delayed_work(system_power_efficient_wq, &bcdev->connector_recovery_work,
 		msecs_to_jiffies(1000));
 }
 
@@ -1139,7 +1139,7 @@ static void oplus_charger_type_check_work(struct work_struct *work)
 	chg_err("chip->charger_type[%d],count:%d\n", charger_type, count);
 	if (charger_type == POWER_SUPPLY_TYPE_UNKNOWN && (count < 6)) {
 		count++;
-		schedule_delayed_work(&bcdev->check_charger_type_work,
+		queue_delayed_work(system_power_efficient_wq, &bcdev->check_charger_type_work,
 				msecs_to_jiffies(500));
 	} else {
 		oplus_chg_wake_update_work();
@@ -1296,7 +1296,7 @@ static void handle_notification(struct battery_chg_dev *bcdev, void *data,
 	case BC_USB_STATUS_ONLINE:
 		bcdev->count_run = 0;
 		if (gpio_is_valid(bcdev->vbus_ctrl))
-			schedule_delayed_work(&bcdev->connector_check_work,
+			queue_delayed_work(system_power_efficient_wq, &bcdev->connector_check_work,
 				msecs_to_jiffies(1000));
 #ifdef OPLUS_CHG_OP_DEF
 		if (oplus_warp_get_ffc_chg_start())
@@ -1313,7 +1313,7 @@ static void handle_notification(struct battery_chg_dev *bcdev, void *data,
 		if (is_usb_ocm_available(bcdev))
 			pst = &bcdev->ocm_list[OCM_TYPE_USB];
 		if (probe_done)
-			schedule_delayed_work(&bcdev->usb_disconnect_work, msecs_to_jiffies(500));
+			queue_delayed_work(system_power_efficient_wq, &bcdev->usb_disconnect_work, msecs_to_jiffies(500));
 		oplus_chg_wake_update_work();
 		break;
 	case BC_WLS_STATUS_ONLINE:
@@ -1335,7 +1335,7 @@ static void handle_notification(struct battery_chg_dev *bcdev, void *data,
 		pst = &bcdev->ocm_list[OCM_TYPE_USB];
 		if (is_usb_ocm_available(bcdev))
 			oplus_chg_mod_event(pst->ocm, pst->ocm, OPLUS_CHG_EVENT_PRESENT);
-		schedule_delayed_work(&bcdev->charge_status_check_work,
+		queue_delayed_work(system_power_efficient_wq, &bcdev->charge_status_check_work,
 			msecs_to_jiffies(500));
 		break;
 	case BC_USB_STATUS_NO_PRESENT:
@@ -1345,7 +1345,7 @@ static void handle_notification(struct battery_chg_dev *bcdev, void *data,
 		if (is_usb_ocm_available(bcdev))
 			pst = &bcdev->ocm_list[OCM_TYPE_USB];
 		if (probe_done)
-			schedule_delayed_work(&bcdev->usb_disconnect_work, msecs_to_jiffies(500));
+			queue_delayed_work(system_power_efficient_wq, &bcdev->usb_disconnect_work, msecs_to_jiffies(500));
 		oplus_chg_wake_update_work();
 		break;
 	case BC_USB_STATUS_APSD_DONE:
@@ -1353,13 +1353,13 @@ static void handle_notification(struct battery_chg_dev *bcdev, void *data,
 		if (is_usb_ocm_available(bcdev))
 			oplus_chg_global_event(pst->ocm, OPLUS_CHG_EVENT_APSD_DONE);
 		oplus_chg_wake_update_work();
-		schedule_delayed_work(&bcdev->check_charger_type_work,
+		queue_delayed_work(system_power_efficient_wq, &bcdev->check_charger_type_work,
 			msecs_to_jiffies(500));
 		break;
 	case BC_OTG_ENABLE:
 		schedule_work(&bcdev->otg_enable_work);
 		if (bcdev->otg_type == OTG_DEFAULT_DCDC)
-			schedule_delayed_work(&bcdev->otg_status_check_work, 0);
+			queue_delayed_work(system_power_efficient_wq, &bcdev->otg_status_check_work, 0);
 		chip->otg_online = true;
 		if (is_batt_ocm_available(bcdev))
 			pst = &bcdev->ocm_list[OCM_TYPE_BATTERY];
@@ -3141,7 +3141,7 @@ void oplus_adsp_crash_recover_work(void)
 	}
 
 	bcdev = chip->pmic_spmi.bcdev_chip;
-	schedule_delayed_work(&bcdev->adsp_crash_recover_work, round_jiffies_relative(msecs_to_jiffies(1500)));
+	queue_delayed_work(system_power_efficient_wq, &bcdev->adsp_crash_recover_work, round_jiffies_relative(msecs_to_jiffies(1500)));
 #endif
 }
 EXPORT_SYMBOL(oplus_adsp_crash_recover_work);
@@ -3857,8 +3857,8 @@ static int battery_chg_probe(struct platform_device *pdev)
 #endif
 	oplus_vbus_ctrl_gpio_request(bcdev);
 	if (gpio_is_valid(bcdev->vbus_ctrl))
-		schedule_delayed_work(&bcdev->connector_check_work, msecs_to_jiffies(10000));
-	schedule_delayed_work(&bcdev->otg_init_work, 0);
+		queue_delayed_work(system_power_efficient_wq, &bcdev->connector_check_work, msecs_to_jiffies(10000));
+	queue_delayed_work(system_power_efficient_wq, &bcdev->otg_init_work, 0);
 	if (bcdev->ocm_list[OCM_TYPE_BATTERY].ocm)
 		oplus_chg_mod_changed(bcdev->ocm_list[OCM_TYPE_BATTERY].ocm);
 	probe_done = true;

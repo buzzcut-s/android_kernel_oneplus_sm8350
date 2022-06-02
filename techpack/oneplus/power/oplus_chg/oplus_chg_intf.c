@@ -332,7 +332,7 @@ static void oplus_chg_batt_update_work(struct work_struct *work)
 		dev->batt_update_count++;
 		if (dev->batt_ocm)
 			oplus_chg_mod_changed(dev->batt_ocm);
-		schedule_delayed_work(&dev->batt_update_work, msecs_to_jiffies(500));
+		queue_delayed_work(system_power_efficient_wq, &dev->batt_update_work, msecs_to_jiffies(500));
 		return;
 	}
 
@@ -963,7 +963,7 @@ static int oplus_chg_intf_usb_event_notifier_call(struct notifier_block *nb,
 		}
 #ifdef OPLUS_CHG_OP_DEF
 		if (chip && chip->check_abnormal_voltage_work.work.func)
-			schedule_delayed_work(&chip->check_abnormal_voltage_work, msecs_to_jiffies(200));
+			queue_delayed_work(system_power_efficient_wq, &chip->check_abnormal_voltage_work, msecs_to_jiffies(200));
 #endif
 		break;
 	case OPLUS_CHG_EVENT_PRESENT:
@@ -981,7 +981,7 @@ static int oplus_chg_intf_usb_event_notifier_call(struct notifier_block *nb,
 								50);
 		if (chip && chip->recovery_chg_type_work.work.func
 			&& chip->abnormal_volt_detected && (boot_mode == MSM_BOOT_MODE__NORMAL))
-			schedule_delayed_work(&chip->recovery_chg_type_work, msecs_to_jiffies(800));
+			queue_delayed_work(system_power_efficient_wq, &chip->recovery_chg_type_work, msecs_to_jiffies(800));
 #endif
 		break;
 	case OPLUS_CHG_EVENT_APSD_DONE:
@@ -1050,7 +1050,7 @@ static int oplus_chg_intf_usb_mod_notifier_call(struct notifier_block *nb,
 	case OPLUS_CHG_EVENT_OFFLINE:
 #ifdef OPLUS_CHG_OP_DEF
 		if (oplus_warp_ignore_event() == true) {
-			schedule_delayed_work(&op_dev->charger_status_check_work, msecs_to_jiffies(5000));
+			queue_delayed_work(system_power_efficient_wq, &op_dev->charger_status_check_work, msecs_to_jiffies(5000));
 			break;
 		}
 #endif
@@ -1066,7 +1066,7 @@ static int oplus_chg_intf_usb_mod_notifier_call(struct notifier_block *nb,
 					op_dev->icon_debounce = true;
 					if (chip->reconnect_count == 0)
 						chip->norchg_reconnect_count++;
-					schedule_delayed_work(&op_dev->connect_check_work, msecs_to_jiffies(2000));
+					queue_delayed_work(system_power_efficient_wq, &op_dev->connect_check_work, msecs_to_jiffies(2000));
 				} else {
 					chip->reconnect_count = 0;
 					chip->norchg_reconnect_count = 0;
@@ -1100,7 +1100,7 @@ static int oplus_chg_intf_usb_mod_notifier_call(struct notifier_block *nb,
 					oplus_chg_mod_changed(op_dev->usb_ocm);
 				}
 				op_dev->batt_update_count = 0;
-				schedule_delayed_work(&op_dev->batt_update_work,
+				queue_delayed_work(system_power_efficient_wq, &op_dev->batt_update_work,
 					msecs_to_jiffies(500));
 			}
 		}
@@ -1121,7 +1121,7 @@ static int oplus_chg_intf_usb_mod_notifier_call(struct notifier_block *nb,
 					op_dev->icon_debounce = true;
 					if (chip->reconnect_count == 0)
 						chip->norchg_reconnect_count++;
-					schedule_delayed_work(&op_dev->connect_check_work, msecs_to_jiffies(1000));
+					queue_delayed_work(system_power_efficient_wq, &op_dev->connect_check_work, msecs_to_jiffies(1000));
 				} else {
 					chip->reconnect_count = 0;
 					chip->norchg_reconnect_count = 0;

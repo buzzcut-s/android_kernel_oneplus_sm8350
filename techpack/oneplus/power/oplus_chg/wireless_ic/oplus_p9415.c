@@ -1380,7 +1380,7 @@ static void p9415_event_process(struct oplus_p9415 *chip)
 	p9415_write_byte_mask(chip, 0x0037, 0xFF, 0x00);
 	p9415_write_byte_mask(chip, 0x0056, 0x30, 0x30);
 	p9415_write_byte_mask(chip, 0x004E, 0x20, 0x20);
-	schedule_delayed_work(&chip->check_event_work, msecs_to_jiffies(100));
+	queue_delayed_work(system_power_efficient_wq, &chip->check_event_work, msecs_to_jiffies(100));
 }
 
 static int p9415_connect_check(struct oplus_chg_ic_dev *dev)
@@ -1392,7 +1392,7 @@ static int p9415_connect_check(struct oplus_chg_ic_dev *dev)
 		return -ENODEV;
 	}
 	chip = oplus_chg_ic_get_drvdata(dev);
-	schedule_delayed_work(&chip->connect_work, 0);
+	queue_delayed_work(system_power_efficient_wq, &chip->connect_work, 0);
 
 	return 0;
 }
@@ -1456,7 +1456,7 @@ static void p9415_check_event_work(struct work_struct *work)
 		if (od2_state == false){
 			pr_err("OD2 is low, reread the event.");
 			p9415_event_process(chip);
-			schedule_delayed_work(&chip->check_event_work, msecs_to_jiffies(1000));
+			queue_delayed_work(system_power_efficient_wq, &chip->check_event_work, msecs_to_jiffies(1000));
 		}
 	}
 }
@@ -1502,7 +1502,7 @@ retry:
 		if (connected) {
 			chip->connected_ldo_on = false;
 			cancel_delayed_work_sync(&chip->check_ldo_on_work);
-			schedule_delayed_work(&chip->check_ldo_on_work, P9415_CHECK_LDO_ON_DELAY);
+			queue_delayed_work(system_power_efficient_wq, &chip->check_ldo_on_work, P9415_CHECK_LDO_ON_DELAY);
 			oplus_chg_anon_mod_event(chip->wls_ocm, OPLUS_CHG_EVENT_PRESENT);
 		} else {
 			chip->connected_ldo_on = false;
@@ -1518,7 +1518,7 @@ static irqreturn_t p9415_event_handler(int irq, void *dev_id)
 	struct oplus_p9415 *chip = dev_id;
 
 	pr_err("event irq\n");
-	schedule_delayed_work(&chip->event_work, 0);
+	queue_delayed_work(system_power_efficient_wq, &chip->event_work, 0);
 	return IRQ_HANDLED;
 }
 
@@ -1527,7 +1527,7 @@ static irqreturn_t p9415_connect_handler(int irq, void *dev_id)
 	struct oplus_p9415 *chip = dev_id;
 
 	pr_err("connect irq\n");
-	schedule_delayed_work(&chip->connect_work, 0);
+	queue_delayed_work(system_power_efficient_wq, &chip->connect_work, 0);
 	return IRQ_HANDLED;
 }
 
@@ -1720,7 +1720,7 @@ static int p9415_driver_probe(struct i2c_client *client,
 	INIT_DELAYED_WORK(&chip->check_event_work, p9415_check_event_work);
 	mutex_init(&chip->i2c_lock);
 
-	schedule_delayed_work(&chip->connect_work, 0);
+	queue_delayed_work(system_power_efficient_wq, &chip->connect_work, 0);
 
 	return 0;
 
