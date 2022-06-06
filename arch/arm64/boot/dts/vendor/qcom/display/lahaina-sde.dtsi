@@ -43,7 +43,7 @@
 			"hdcp_physical", "dp_p1", "gdsc";
 
 		interrupt-parent = <&mdss_mdp>;
-		interrupts = <12 0>;
+		interrupts = <12>;
 
 		#clock-cells = <1>;
 		clocks =  <&clock_dispcc DISP_CC_MDSS_DP_AUX_CLK>,
