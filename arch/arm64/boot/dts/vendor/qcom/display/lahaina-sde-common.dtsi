@@ -287,7 +287,7 @@
 			<0x0ae36000 0x300>;
 		reg-names = "dsi_ctrl", "disp_cc_base", "mdp_intf_base";
 		interrupt-parent = <&mdss_mdp>;
-		interrupts = <4 0>;
+		interrupts = <4>;
 
 		qcom,ctrl-supply-entries {
 			#address-cells = <1>;
@@ -327,7 +327,7 @@
 			<0x0ae37000 0x300>;
 		reg-names = "dsi_ctrl", "disp_cc_base", "mdp_intf_base";
 		interrupt-parent = <&mdss_mdp>;
-		interrupts = <5 0>;
+		interrupts = <5>;
 
 		qcom,ctrl-supply-entries {
 			#address-cells = <1>;
