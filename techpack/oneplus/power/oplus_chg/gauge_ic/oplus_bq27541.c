@@ -2872,6 +2872,8 @@ static int gauge_reg_dump(void)
 		return -1;
 	}
 
+	return 0;
+
 	pos = buf;
 	if (oplus_warp_get_allow_reading() == true) {
 		l = sprintf(pos, "%d ", bq27541_get_battery_temperature());
@@ -2939,7 +2941,7 @@ static int gauge_reg_dump(void)
 			}
 		}
 	}
-	printk(KERN_ERR "[OPLUS_CHG]gauge type: %d, regs: %s\n", gauge_ic->device_type, buf);
+	// printk(KERN_ERR "[OPLUS_CHG]gauge type: %d, regs: %s\n", gauge_ic->device_type, buf);
 	return 0;
 }
 

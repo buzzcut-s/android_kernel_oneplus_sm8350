@@ -42,7 +42,7 @@
 /***********************************************************/
 /*customer config*/
 /***********************************************************/
-#define M1120_DBG_ENABLE                    // for debugging
+//#define M1120_DBG_ENABLE                    // for debugging
 #define M1120_DETECTION_MODE                M1120_DETECTION_MODE_INTERRUPT/*M1120_DETECTION_MODE_POLLING /James*/
 #define M1120_INTERRUPT_TYPE                M1120_VAL_INTSRS_INTTYPE_BESIDE
 //#define M1120_INTERRUPT_TYPE                M1120_VAL_INTSRS_INTTYPE_WITHIN
@@ -69,24 +69,21 @@
 /*debug macro*/
 /***********************************************************/
 #ifdef M1120_DBG_ENABLE
-#define dbg(fmt, args...)  printk("[M1120-DBG] %s(L%04d) : " fmt "\n", __func__, __LINE__, ##args)
-#define dbgn(fmt, args...)  printk(fmt, ##args)
-#else
 #define dbg(fmt, args...)
 #define dbgn(fmt, args...)
+#else
+#define dbg(fmt, args...) 
+#define dbgn(fmt, args...) 
 #endif // M1120_DBG_ENABLE
-#define dbg_func_in()      dbg("[M1120-DBG-F.IN] %s", __func__)
-#define dbg_func_out()    dbg("[M1120-DBG-F.OUT] %s", __func__)
-#define dbg_line()        dbg("[LINE] %d(%s)", __LINE__, __func__)
+#define dbg_func_in()
+#define dbg_func_out()
+#define dbg_line()
 
 #define TRI_KEY_TAG                  "[tri_state_key] "
-#define TRI_KEY_ERR(fmt, args...)    printk(KERN_ERR TRI_KEY_TAG" %s : "fmt, __FUNCTION__, ##args)
-#define TRI_KEY_LOG(fmt, args...)    printk(KERN_INFO TRI_KEY_TAG" %s : "fmt, __FUNCTION__, ##args)
+#define TRI_KEY_ERR(fmt, args...)  
+#define TRI_KEY_LOG(fmt, args...)  
 #define TRI_KEY_DEBUG(fmt, args...)\
-	do{\
-		if (LEVEL_DEBUG == tri_key_debug)\
-		printk(KERN_INFO TRI_KEY_TAG " %s: " fmt, __FUNCTION__, ##args);\
-	}while(0)
+	do { } while (0)
 
 /***********************************************************/
 

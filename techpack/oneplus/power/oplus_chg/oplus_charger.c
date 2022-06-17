@@ -608,9 +608,8 @@ int oplus_battery_set_property(struct power_supply *psy, enum power_supply_prope
 }
 #endif /* CONFIG_OPLUS_CHG_GKI_SUPPORT */
 
-#define OPLUS_MIDAS_CHG_DEBUG 1
 #ifdef OPLUS_MIDAS_CHG_DEBUG
-#define midas_debug(fmt, args...) pr_notice("[OPLUS_MIDAS_CHG_DEBUG]" fmt, ##args)
+#define midas_debug(fmt, args...)
 #else
 #define midas_debug(fmt, args...)
 #endif /* OPLUS_MIDAS_CHG_DEBUG */
@@ -3593,13 +3592,13 @@ void oplus_chg_set_input_current_limit(struct oplus_chg_chip *chip)
 		}
 #ifdef OPLUS_CHG_OP_DEF
 		if (chip->norchg_reconnect_count == 1) {
-			pr_info("norchg_reconnect_count = 1\n");
+			pr_debug("norchg_reconnect_count = 1\n");
 			if (current_limit > 1500) {
 				current_limit = 1500;
 				CURRENT_LIMIT_PRINT("norchg_reconnect_count == 1");
 			}
 		} else if (chip->norchg_reconnect_count > 1) {
-			pr_info("norchg_reconnect_count = %d\n", chip->norchg_reconnect_count);
+			pr_debug("norchg_reconnect_count = %d\n", chip->norchg_reconnect_count);
 			if (current_limit > 1000) {
 				current_limit = 1000;
 				CURRENT_LIMIT_PRINT("norchg_reconnect_count > 1");
@@ -3714,7 +3713,7 @@ void oplus_chg_set_input_current_limit(struct oplus_chg_chip *chip)
 			    chip->led_on, chip->chg_ctrl_by_cool_down, current_limit, chip->led_temp_status);
 #endif
 out:
-	pr_info("chip->chg_ops->input_current_write(%d)\n", current_limit);
+	pr_debug("chip->chg_ops->input_current_write(%d)\n", current_limit);
 	chip->chg_ops->input_current_write(current_limit);
 }
 
@@ -5764,7 +5763,7 @@ void oplus_check_ovp_status(struct oplus_chg_chip *chg)
 	}
 
 	if (chg->hw_detected && ((chg->charger_volt <= VOLT_LOW_VBUS_VALUE) && (chg->charger_volt >= VOLT_HIGH_VBUS_VALUE))) {
-		pr_info("chg->hw_detected:%d return\n", chg->hw_detected);
+		pr_debug("chg->hw_detected:%d return\n", chg->hw_detected);
 		return;
 	}
 	chg_err("oplus_check_ovp_status vph:%d,vbus:%d \n", chg->vph_voltage, chg->charger_volt);
@@ -5806,7 +5805,7 @@ static void oplus_check_battery_vol_diff(struct oplus_chg_chip *chg)
 		vbat_cell_min = 3800;
 	}
 	vbat_cell_min = pval.intval;
-	pr_info("bat vol:(%d,%d)\n", vbat_cell_max, vbat_cell_min);
+	pr_debug("bat vol:(%d,%d)\n", vbat_cell_max, vbat_cell_min);
 	if (abs(vbat_cell_max - vbat_cell_min) > ALLOW_DIFF_VALUE) {
 		chg->check_battery_vol_count++;
 		if (chg->check_battery_vol_count > 5) {
@@ -5820,7 +5819,7 @@ static void oplus_check_battery_vol_diff(struct oplus_chg_chip *chg)
 			chg->notify_code |= 1 << NOTIFY_BAT_VOLTAGE_DIFF;
 			chg->authenticate = false;
 			chg->check_battery_vol_count = 0;
-			pr_info("BATTERY_SOFT_DIFF_VOLTAGE disable chg\n");
+			pr_debug("BATTERY_SOFT_DIFF_VOLTAGE disable chg\n");
 		}
 	} else {
 		if (chg->bat_volt_different) {
@@ -5829,7 +5828,7 @@ static void oplus_check_battery_vol_diff(struct oplus_chg_chip *chg)
 				chg->bat_volt_different = false;
 				chg->authenticate = true;
 				chg->check_battery_vol_count = 0;
-				pr_info("Recovery BATTERY_SOFT_DIFF_VOLTAGE\n");
+				pr_debug("Recovery BATTERY_SOFT_DIFF_VOLTAGE\n");
 			}
 		} else {
 			chg->check_battery_vol_count = 0;

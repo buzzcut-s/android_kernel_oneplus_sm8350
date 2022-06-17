@@ -1872,9 +1872,9 @@ static QDF_STATUS send_wow_enable_cmd_tlv(wmi_unified_t wmi_handle,
 	cmd->flags = param->flags;
 
 	wmi_debug("suspend type: %s flag is 0x%x",
-		  cmd->pause_iface_config == WOW_IFACE_PAUSE_ENABLED ?
-		  "WOW_IFACE_PAUSE_ENABLED" : "WOW_IFACE_PAUSE_DISABLED",
-		  cmd->flags);
+		 cmd->pause_iface_config == WOW_IFACE_PAUSE_ENABLED ?
+		 "WOW_IFACE_PAUSE_ENABLED" : "WOW_IFACE_PAUSE_DISABLED",
+		 cmd->flags);
 
 	wmi_mtrace(WMI_WOW_ENABLE_CMDID, NO_SESSION, 0);
 	ret = wmi_unified_cmd_send(wmi_handle, buf, len,
