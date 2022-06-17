@@ -8008,7 +8008,7 @@ int dsi_display_validate_mode_change(struct dsi_display *display,
 				mode_fps = adj_mode->timing.refresh_rate;
 				dynamic_fps = mode_fps;
 				notifier_data.data = &dynamic_fps;
-				DSI_ERR("set fps: %d\n", dynamic_fps);
+				pr_info("[dsi]: MODE set fps: %d\n", dynamic_fps);
 				if (&display->panel->drm_panel != NULL)
 					drm_panel_notifier_call_chain(&display->panel->drm_panel, DRM_PANEL_EARLY_EVENT_BLANK, &notifier_data);
 			}
@@ -8024,6 +8024,10 @@ int dsi_display_validate_mode_change(struct dsi_display *display,
 					adj_mode->timing.h_front_porch,
 					cur_mode->timing.v_front_porch,
 					adj_mode->timing.v_front_porch);
+			}
+			if (cur_mode->timing.refresh_rate != adj_mode->timing.refresh_rate) {
+				WRITE_ONCE(cur_refresh_rate, adj_mode->timing.refresh_rate);
+				pr_info("[dsi]: TIMING cur_refresh_rate set to %d\n", adj_mode->timing.refresh_rate);
 			}
 		}
 
