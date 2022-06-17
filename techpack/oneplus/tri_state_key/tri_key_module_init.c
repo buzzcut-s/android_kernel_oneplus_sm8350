@@ -5,13 +5,10 @@
 #include "../../../drivers/extcon/extcon.h"
 
 #define TRI_KEY_TAG                  "[tri_state_key] "
-#define TRI_KEY_ERR(fmt, args...)    printk(KERN_ERR TRI_KEY_TAG" %s : "fmt, __FUNCTION__, ##args)
-#define TRI_KEY_LOG(fmt, args...)    printk(KERN_INFO TRI_KEY_TAG" %s : "fmt, __FUNCTION__, ##args)
+#define TRI_KEY_ERR(fmt, args...)
+#define TRI_KEY_LOG(fmt, args...)
 #define TRI_KEY_DEBUG(fmt, args...)\
-	do{\
-		if (LEVEL_DEBUG == tri_key_debug)\
-			printk(KERN_INFO TRI_KEY_TAG " %s: " fmt, __FUNCTION__, ##args);\
-	}while(0)
+	do { } while (0)
 
 //extern struct platform_driver tristate_dev_driver;
 extern struct platform_driver tri_key_platform_driver;

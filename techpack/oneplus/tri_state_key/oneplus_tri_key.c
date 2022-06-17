@@ -49,13 +49,10 @@
 #include "oneplus_tri_key.h"
 #include "../../../drivers/extcon/extcon.h"
 #define TRI_KEY_TAG                  "[tri_state_key] "
-#define TRI_KEY_ERR(fmt, args...)    printk(KERN_ERR TRI_KEY_TAG" %s : "fmt, __FUNCTION__, ##args)
-#define TRI_KEY_LOG(fmt, args...)    printk(KERN_INFO TRI_KEY_TAG" %s : "fmt, __FUNCTION__, ##args)
+#define TRI_KEY_ERR(fmt, args...)
+#define TRI_KEY_LOG(fmt, args...)
 #define TRI_KEY_DEBUG(fmt, args...)\
-	do{\
-		if (LEVEL_DEBUG == tri_key_debug)\
-			printk(KERN_INFO TRI_KEY_TAG " %s: " fmt, __FUNCTION__, ##args);\
-	}while(0)
+	do { } while (0)
 enum {
 	MODE_UNKNOWN,
 	MODE_MUTE,
@@ -1131,7 +1128,7 @@ static ssize_t hall_debug_info_store(struct device *dev, struct device_attribute
 		return count;
 	strlcpy(buffer, buf, sizeof(buffer));
 	if (1 == sscanf(buffer, "%d", &tmp)) {
-		tri_key_debug = tmp;
+		tri_key_debug = 0;
 	} else {
 		TRI_KEY_DEBUG("invalid content: '%s', length = %zd\n", buf, count);
 	}

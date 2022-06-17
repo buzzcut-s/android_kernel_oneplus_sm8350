@@ -19,7 +19,7 @@
 
 /* Debugging macro's. */
 #   ifndef DEBUG
-#      define DEBUG
+//#      define DEBUG
 #   endif
 
 #   ifndef ASSERT
@@ -27,7 +27,7 @@
 #   endif
  //TODO wwwim
 #   ifndef _ASSERT
-		#define _ASSERT(e)
+//		#define _ASSERT(e)
 #   endif
 
 #   ifndef PREFIX
@@ -38,10 +38,7 @@
 #ifdef __KERNEL__
 
 #   ifdef DEBUG
-#      define _DEBUG(level,fmt,va...) do {\
-                if (unlikely(debug >= (level))) \
-                        printk(KERN_INFO PREFIX "%s:%d: "fmt,__func__,__LINE__,##va); \
-        } while (0)
+#      define _DEBUG(level,fmt,va...) do {} while (0)
 
 #   else
 #      define _DEBUG(level,fmt,va...) do {} while(0)

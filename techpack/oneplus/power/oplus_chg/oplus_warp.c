@@ -34,11 +34,7 @@
 extern int charger_abnormal_log;
 extern int enable_charger_log;
 #define warp_xlog_printk(num, fmt, ...) \
-	do { \
-		if (enable_charger_log >= (int)num) { \
-			printk(KERN_NOTICE pr_fmt("[OPLUS_CHG][%s]"fmt), __func__, ##__VA_ARGS__);\
-	} \
-} while (0)
+	do { } while (0)
 
 #ifndef OPLUS_CHG_OP_DEF
 static struct oplus_warp_chip *g_warp_chip = NULL;
