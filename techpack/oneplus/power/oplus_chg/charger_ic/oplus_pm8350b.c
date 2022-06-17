@@ -359,7 +359,7 @@ static void oplus_get_regmap_work(struct work_struct *work)
 	if (dev == NULL) {
 		if (count --) {
 			pr_err("qcom,pm8350b-debug not found, retry count: %d\n", count);
-			schedule_delayed_work(&chip->get_regmap_work, msecs_to_jiffies(1000));
+			queue_delayed_work(system_power_efficient_wq, &chip->get_regmap_work, msecs_to_jiffies(1000));
 		} else {
 			pr_err("qcom,pm8350b-debug not found, retry done\n");
 		}
@@ -422,7 +422,7 @@ static int oplus_chg_typec_driver_probe(struct platform_device *pdev)
 	}
 
 	INIT_DELAYED_WORK(&chip->get_regmap_work, oplus_get_regmap_work);
-	schedule_delayed_work(&chip->get_regmap_work, 0);
+	queue_delayed_work(system_power_efficient_wq, &chip->get_regmap_work, 0);
 
 	pr_err("probe success\n");
 	return 0;

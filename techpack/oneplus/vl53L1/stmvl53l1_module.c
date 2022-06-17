@@ -798,7 +798,7 @@ static int stmvl53l1_start(struct stmvl53l1_data *data)
 
 	if (data->poll_mode) {
 		/* kick off the periodical polling work */
-		schedule_delayed_work(&data->dwork,
+		queue_delayed_work(system_power_efficient_wq, &data->dwork,
 			msecs_to_jiffies(data->poll_delay_ms));
 	}
 done:
@@ -3613,7 +3613,7 @@ static void stmvl53l1_work_handler(struct work_struct *work)
 	stmvl53l1_intr_process(data);
 	if (data->poll_mode && data->enable_sensor) {
 		/* re-sched ourself */
-		schedule_delayed_work(&data->dwork,
+		queue_delayed_work(system_power_efficient_wq, &data->dwork,
 			msecs_to_jiffies(data->poll_delay_ms));
 	}
 	mutex_unlock(&data->work_mutex);

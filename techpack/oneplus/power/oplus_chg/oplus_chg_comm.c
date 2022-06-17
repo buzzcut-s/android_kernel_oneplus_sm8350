@@ -877,10 +877,10 @@ static int oplus_chg_comm_event_notifier_call(struct notifier_block *nb,
 		if (!strcmp(owner_ocm->desc->name, "wireless")) {
 			pr_info("wls online\n");
 			comm_dev->wls_chging_keep = true;
-			schedule_delayed_work(&comm_dev->heartbeat_work,
+			queue_delayed_work(system_power_efficient_wq, &comm_dev->heartbeat_work,
 				round_jiffies_relative(msecs_to_jiffies
 					(HEARTBEAT_INTERVAL_MS)));
-			schedule_delayed_work(&comm_dev->wls_chging_keep_clean_work,
+			queue_delayed_work(system_power_efficient_wq, &comm_dev->wls_chging_keep_clean_work,
 				msecs_to_jiffies(2000));
 		}
 		break;
@@ -896,7 +896,7 @@ static int oplus_chg_comm_event_notifier_call(struct notifier_block *nb,
 		}
 #if (defined(CONFIG_OPLUS_CHG_OOS) && defined(CONFIG_OPLUS_CHG_DYNAMIC_CONFIG))
 		if (comm_dev->config_update_pending)
-			schedule_delayed_work(&comm_dev->config_update_work, 0);
+			queue_delayed_work(system_power_efficient_wq, &comm_dev->config_update_work, 0);
 #endif
 		break;
 	default:
@@ -991,7 +991,7 @@ static int oplus_chg_comm_lcd_active_call(struct notifier_block *nb,
 		 * may result in slow charging. Adding a 1-minute delay here can effectively
 		 * intercept short-lived screen-on events without affecting heat.
 		 */
-		schedule_delayed_work(&comm_dev->led_power_on_report_work, msecs_to_jiffies(60000));
+		queue_delayed_work(system_power_efficient_wq, &comm_dev->led_power_on_report_work, msecs_to_jiffies(60000));
 		break;
 	default:
 		break;
@@ -2245,7 +2245,7 @@ static void oplus_chg_heartbeat_work(struct work_struct *work)
 	}
 out:
 	/*update time 5s*/
-	schedule_delayed_work(&comm_dev->heartbeat_work,
+	queue_delayed_work(system_power_efficient_wq, &comm_dev->heartbeat_work,
 			round_jiffies_relative(msecs_to_jiffies
 				(HEARTBEAT_INTERVAL_MS)));
 }

@@ -2010,7 +2010,7 @@ static void oplus_chg_show_ui_soc_decimal(struct work_struct *work)
 
 	if(chip->calculate_decimal_time<= MAX_UI_DECIMAL_TIME) {
 		chip->calculate_decimal_time++;
-	   	schedule_delayed_work(&chip->ui_soc_decimal_work, msecs_to_jiffies(UPDATE_TIME * 1000));
+	   	queue_delayed_work(system_power_efficient_wq, &chip->ui_soc_decimal_work, msecs_to_jiffies(UPDATE_TIME * 1000));
 	} else {
 		oplus_chg_ui_soc_decimal_deinit();
 	}
@@ -2128,7 +2128,7 @@ static void mmi_adapter_in_work_func(struct work_struct *work)
 static void oplus_mmi_fastchg_in(struct oplus_chg_chip *chip)
 {
 	charger_xlog_printk(CHG_LOG_CRTI, "  call\n");
-	schedule_delayed_work(&chip->mmi_adapter_in_work,
+	queue_delayed_work(system_power_efficient_wq, &chip->mmi_adapter_in_work,
 	round_jiffies_relative(msecs_to_jiffies(2000)));
 }
 
@@ -2299,7 +2299,7 @@ static void oplus_recovery_chg_type_work(struct work_struct *work)
 		chg->chg_ops->rerun_apsd();
 		mdelay(600);
 		chg->chg_redetect_charger_type = true;
-		schedule_delayed_work(&chg->update_work, msecs_to_jiffies(1));
+		queue_delayed_work(system_power_efficient_wq, &chg->update_work, msecs_to_jiffies(1));
 		return;
 	}
 }
@@ -2413,7 +2413,7 @@ int oplus_chg_init(struct oplus_chg_chip *chip)
 #ifdef OPLUS_CHG_OP_DEF
 	oplus_chg_get_battery_data(chip);
 #endif
-	schedule_delayed_work(&chip->update_work, OPLUS_CHG_UPDATE_INIT_DELAY);
+	queue_delayed_work(system_power_efficient_wq, &chip->update_work, OPLUS_CHG_UPDATE_INIT_DELAY);
 	INIT_DELAYED_WORK(&chip->mmi_adapter_in_work, mmi_adapter_in_work_func);
 	chip->shell_themal = thermal_zone_get_zone_by_name("shell_back");
 	if (IS_ERR(chip->shell_themal)) {
@@ -5151,7 +5151,7 @@ static int fb_notifier_callback(struct notifier_block *nb,
 			 * may result in slow charging. Adding a 1-minute delay here can effectively
 			 * intercept short-lived screen-on events without affecting heat.
 			 */
-			schedule_delayed_work(&g_charger_chip->led_power_on_report_work, msecs_to_jiffies(60000));
+			queue_delayed_work(system_power_efficient_wq, &g_charger_chip->led_power_on_report_work, msecs_to_jiffies(60000));
 #endif
 		} else if (blank == MSM_DRM_BLANK_POWERDOWN) {
 #ifdef OPLUS_CHG_OP_DEF
@@ -8607,11 +8607,11 @@ static void oplus_chg_update_work(struct work_struct *work)
 			system_highpri_wq, &chip->update_work,
 			OPLUS_CHG_UPDATE_INTERVAL(oplus_chg_update_slow(chip)));
 	} else {
-		schedule_delayed_work(&chip->update_work,
+		queue_delayed_work(system_power_efficient_wq, &chip->update_work,
 				      OPLUS_CHG_UPDATE_INTERVAL(oplus_chg_update_slow(chip)));
 	}
 #else
-	schedule_delayed_work(&chip->update_work, OPLUS_CHG_UPDATE_INTERVAL);
+	queue_delayed_work(system_power_efficient_wq, &chip->update_work, OPLUS_CHG_UPDATE_INTERVAL);
 #endif
 }
 void oplus_chg_cancel_update_work_sync(void)
@@ -8629,7 +8629,7 @@ void oplus_chg_restart_update_work(void)
 		return;
 	}
 
-	schedule_delayed_work(&g_charger_chip->update_work, 0);
+	queue_delayed_work(system_power_efficient_wq, &g_charger_chip->update_work, 0);
 }
 bool oplus_chg_wake_update_work(void)
 {
@@ -8654,7 +8654,7 @@ void oplus_chg_reset_adapter(void)
 	if (!g_charger_chip) {
 		return;
 	}
-	schedule_delayed_work(&g_charger_chip->reset_adapter_work, 0);
+	queue_delayed_work(system_power_efficient_wq, &g_charger_chip->reset_adapter_work, 0);
 }
 
 void oplus_chg_kick_wdt(void)

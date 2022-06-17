@@ -382,7 +382,7 @@ static void m1120_set_enable(struct device *dev, int enable)
 			m1120_set_operation_mode(&p_m1120_data->client->dev, OPERATION_MODE_MEASUREMENT);
 			/*if(!(p_data->reg.map.intsrs & M1120_DETECTION_MODE_INTERRUPT))*/
 			// if (0) {
-			//     schedule_delayed_work(&p_data->work, msecs_to_jiffies(delay));
+			//     queue_delayed_work(system_power_efficient_wq, &p_data->work, msecs_to_jiffies(delay));
 			// }
 		}
 	} else {                        /*disable if state will be changed*/
@@ -422,7 +422,7 @@ static void m1120_set_delay(struct device *dev, int delay)
 	if (m1120_get_enable(dev)) {
 		if (!(p_data->reg.map.intsrs & M1120_DETECTION_MODE_INTERRUPT)) {
 			cancel_delayed_work_sync(&p_data->work);
-			schedule_delayed_work(&p_data->work, msecs_to_jiffies(delay));
+			queue_delayed_work(system_power_efficient_wq, &p_data->work, msecs_to_jiffies(delay));
 		}
 	}
 
@@ -1425,7 +1425,7 @@ static int m1120_i2c_drv_remove(struct i2c_client *client)
    if (m1120_get_enable(&client->dev)) {
    if (p_data->reg.map.intsrs & M1120_DETECTION_MODE_INTERRUPT) {
    m1120_set_detection_mode(&client->dev, M1120_DETECTION_MODE_POLLING);
-   schedule_delayed_work(&p_data->work, msecs_to_jiffies(m1120_get_delay(&client->dev)));
+   queue_delayed_work(system_power_efficient_wq, &p_data->work, msecs_to_jiffies(m1120_get_delay(&client->dev)));
    }
    }
 

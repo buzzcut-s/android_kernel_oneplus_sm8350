@@ -313,7 +313,7 @@ static void warp_watchdog_work_func(struct work_struct *work)
 static void oplus_warp_check_charger_out(struct oplus_warp_chip *chip)
 {
 	warp_xlog_printk(CHG_LOG_CRTI, "  call\n");
-	schedule_delayed_work(&chip->check_charger_out_work,
+	queue_delayed_work(system_power_efficient_wq, &chip->check_charger_out_work,
 		round_jiffies_relative(msecs_to_jiffies(3000)));
 }
 
@@ -1867,7 +1867,7 @@ void fw_update_thread_fix(struct work_struct *work)
 void oplus_warp_fw_update_work_init(struct oplus_warp_chip *chip)
 {
 	INIT_DELAYED_WORK(&chip->fw_update_work, fw_update_thread);
-	schedule_delayed_work(&chip->fw_update_work, round_jiffies_relative(msecs_to_jiffies(FASTCHG_FW_INTERVAL_INIT)));
+	queue_delayed_work(system_power_efficient_wq, &chip->fw_update_work, round_jiffies_relative(msecs_to_jiffies(FASTCHG_FW_INTERVAL_INIT)));
 }
 
 void oplus_warp_fw_update_work_plug_in(void)
@@ -1876,7 +1876,7 @@ void oplus_warp_fw_update_work_plug_in(void)
 		return;
 	chg_err("%s asic didn't work, update fw!\n", __func__);
 	INIT_DELAYED_WORK(&g_warp_chip->fw_update_work_fix, fw_update_thread_fix);
-	schedule_delayed_work(&g_warp_chip->fw_update_work_fix, round_jiffies_relative(msecs_to_jiffies(FASTCHG_FW_INTERVAL_INIT)));
+	queue_delayed_work(system_power_efficient_wq, &g_warp_chip->fw_update_work_fix, round_jiffies_relative(msecs_to_jiffies(FASTCHG_FW_INTERVAL_INIT)));
 }
 
 void oplus_warp_shedule_fastchg_work(void)
@@ -1884,7 +1884,7 @@ void oplus_warp_shedule_fastchg_work(void)
 	if (!g_warp_chip) {
 		chg_err(" g_warp_chip is NULL\n");
 	} else {
-		schedule_delayed_work(&g_warp_chip->fastchg_work, 0);
+		queue_delayed_work(system_power_efficient_wq, &g_warp_chip->fastchg_work, 0);
 	}
 }
 static ssize_t proc_fastchg_fw_update_write(struct file *file, const char __user *buff,
@@ -1905,7 +1905,7 @@ static ssize_t proc_fastchg_fw_update_write(struct file *file, const char __user
 	if (write_data[0] == '1') {
 		chg_err("fastchg_fw_update\n");
 		chip->fw_update_flag = 1;
-		schedule_delayed_work(&chip->fw_update_work, 0);
+		queue_delayed_work(system_power_efficient_wq, &chip->fw_update_work, 0);
 	} else {
 		chip->fw_update_flag = 0;
 		chg_err("Disable fastchg_fw_update\n");
@@ -2061,7 +2061,7 @@ manu_version_alloc_err:
 
 bool oplus_warp_wake_fastchg_work(struct oplus_warp_chip *chip)
 {
-	return schedule_delayed_work(&chip->fastchg_work, 0);
+	return queue_delayed_work(system_power_efficient_wq, &chip->fastchg_work, 0);
 }
 
 void oplus_warp_print_log(void)
@@ -2760,7 +2760,7 @@ static void oplus_chg_asic_init_work(struct work_struct *work)
 	chip->client = asic->client;
 	if (!asic->is_used(asic->client)) {
 		oplus_chg_asic_unregister(asic);
-		schedule_delayed_work(&chip->asic_init_work, 0);
+		queue_delayed_work(system_power_efficient_wq, &chip->asic_init_work, 0);
 		return;
 	}
 
