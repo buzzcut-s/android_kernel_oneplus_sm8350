@@ -97,11 +97,11 @@ static int init_power_cut_test(void)
 	switch (power_cut_mode) {
 	case 1:// drop ps hold
 		INIT_DELAYED_WORK(&power_cut_delayed_work, drop_pshold_work_func);
-		schedule_delayed_work(&power_cut_delayed_work, msecs_to_jiffies(power_cut_delay*1000));
+		queue_delayed_work(system_power_efficient_wq, &power_cut_delayed_work, msecs_to_jiffies(power_cut_delay*1000));
 		break;
 	case 2:// force all power off
 		INIT_DELAYED_WORK(&power_cut_delayed_work, batfet_work_func);
-		schedule_delayed_work(&power_cut_delayed_work, msecs_to_jiffies(power_cut_delay*1000));
+		queue_delayed_work(system_power_efficient_wq, &power_cut_delayed_work, msecs_to_jiffies(power_cut_delay*1000));
 		break;
 	default:
 		return 0;

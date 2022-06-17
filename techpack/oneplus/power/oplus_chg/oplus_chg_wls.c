@@ -870,7 +870,7 @@ static void oplus_chg_wls_send_msg_work(struct work_struct *work)
 	}
 
 out:
-	schedule_delayed_work(&wls_dev->wls_send_msg_work, msecs_to_jiffies(delay_ms));
+	queue_delayed_work(system_power_efficient_wq, &wls_dev->wls_send_msg_work, msecs_to_jiffies(delay_ms));
 }
 
 static int oplus_chg_wls_send_msg(struct oplus_chg_wls *wls_dev, u8 msg, u8 data, int wait_time_s)
@@ -920,7 +920,7 @@ static int oplus_chg_wls_send_msg(struct oplus_chg_wls *wls_dev, u8 msg, u8 data
 	if (wait_time_s > 0) {
 		rx_msg->pending = true;
 		reinit_completion(&wls_dev->msg_ack);
-		schedule_delayed_work(&wls_dev->wls_send_msg_work, msecs_to_jiffies(1000));
+		queue_delayed_work(system_power_efficient_wq, &wls_dev->wls_send_msg_work, msecs_to_jiffies(1000));
 		rc = wait_for_completion_timeout(&wls_dev->msg_ack, msecs_to_jiffies(wait_time_s * 1000));
 		if (!rc) {
 			pr_err("Error, timed out sending message\n");
@@ -937,7 +937,7 @@ static int oplus_chg_wls_send_msg(struct oplus_chg_wls *wls_dev, u8 msg, u8 data
 		rx_msg->pending = false;
 	} else if (wait_time_s < 0) {
 		rx_msg->pending = false;
-		schedule_delayed_work(&wls_dev->wls_send_msg_work, msecs_to_jiffies(1000));
+		queue_delayed_work(system_power_efficient_wq, &wls_dev->wls_send_msg_work, msecs_to_jiffies(1000));
 	}
 
 	return rc;
@@ -991,7 +991,7 @@ static int oplus_chg_wls_send_data(struct oplus_chg_wls *wls_dev, u8 msg, u8 dat
 	if (wait_time_s > 0) {
 		rx_msg->pending = true;
 		reinit_completion(&wls_dev->msg_ack);
-		schedule_delayed_work(&wls_dev->wls_send_msg_work, msecs_to_jiffies(1000));
+		queue_delayed_work(system_power_efficient_wq, &wls_dev->wls_send_msg_work, msecs_to_jiffies(1000));
 		rc = wait_for_completion_timeout(&wls_dev->msg_ack, msecs_to_jiffies(wait_time_s * 1000));
 		if (!rc) {
 			pr_err("Error, timed out sending message\n");
@@ -1008,7 +1008,7 @@ static int oplus_chg_wls_send_data(struct oplus_chg_wls *wls_dev, u8 msg, u8 dat
 		rx_msg->pending = false;
 	} else if (wait_time_s < 0) {
 		rx_msg->pending = false;
-		schedule_delayed_work(&wls_dev->wls_send_msg_work, msecs_to_jiffies(1000));
+		queue_delayed_work(system_power_efficient_wq, &wls_dev->wls_send_msg_work, msecs_to_jiffies(1000));
 	}
 
 	return rc;
@@ -1108,7 +1108,7 @@ static void oplus_chg_wls_verity_work(struct work_struct *work)
 				wls_status->verity_pass = false;
 				goto done;
 			}
-			schedule_delayed_work(&wls_dev->wls_verity_work, msecs_to_jiffies(500));
+			queue_delayed_work(system_power_efficient_wq, &wls_dev->wls_verity_work, msecs_to_jiffies(500));
 			return;
 		}
 		wls_status->verity_pass = false;
@@ -1231,7 +1231,7 @@ done:
 		wls_status->online_keep = true;
 		wls_status->verity_state_keep = true;
 		vote(wls_dev->rx_disable_votable, VERITY_VOTER, true, 1, false);
-		schedule_delayed_work(&wls_dev->rx_verity_restore_work, msecs_to_jiffies(500));
+		queue_delayed_work(system_power_efficient_wq, &wls_dev->rx_verity_restore_work, msecs_to_jiffies(500));
 	}
 }
 
@@ -1576,7 +1576,7 @@ static void oplus_chg_wls_config(struct oplus_chg_wls *wls_dev)
 			wls_status->online_keep = true;
 			vote(wls_dev->rx_disable_votable, JEITA_VOTER, true, 1, false);
 			vote(wls_dev->nor_icl_votable, JEITA_VOTER, true, 0, true);
-			schedule_delayed_work(&wls_dev->rx_restore_work, msecs_to_jiffies(500));
+			queue_delayed_work(system_power_efficient_wq, &wls_dev->rx_restore_work, msecs_to_jiffies(500));
 		} else {
 			vote(wls_dev->rx_disable_votable, JEITA_VOTER, false, 0, false);
 			vote(wls_dev->nor_icl_votable, JEITA_VOTER, true, 0, true);
@@ -1698,7 +1698,7 @@ start:
 		break;
 	case UPGRADE_END:
 		wls_dev->fw_upgrade_by_buf = true;
-		schedule_delayed_work(&wls_dev->wls_upgrade_fw_work, 0);
+		queue_delayed_work(system_power_efficient_wq, &wls_dev->wls_upgrade_fw_work, 0);
 		fw_buf = NULL;
 		upgrade_step = UPGRADE_START;
 		break;
@@ -2160,7 +2160,7 @@ static int oplus_chg_wls_set_prop(struct oplus_chg_mod *ocm, enum oplus_chg_mod_
 		break;
 	case OPLUS_CHG_PROP_FOD_CAL:
 		wls_dev->fod_is_cal = false;
-		schedule_delayed_work(&wls_dev->fod_cal_work, 0);
+		queue_delayed_work(system_power_efficient_wq, &wls_dev->fod_cal_work, 0);
 		break;
 	case OPLUS_CHG_PROP_BATT_CHG_ENABLE:
 		wls_dev->batt_charge_enable = !!pval->intval;
@@ -2252,7 +2252,7 @@ static int oplus_chg_wls_event_notifier_call(struct notifier_block *nb, unsigned
 		if (!strcmp(owner_ocm->desc->name, "usb")) {
 			pr_info("usb online\n");
 			wls_dev->usb_present = true;
-			schedule_delayed_work(&wls_dev->usb_int_work, 0);
+			queue_delayed_work(system_power_efficient_wq, &wls_dev->usb_int_work, 0);
 			if (wls_dev->wls_ocm)
 				oplus_chg_mod_changed(wls_dev->wls_ocm);
 		}
@@ -2264,10 +2264,10 @@ static int oplus_chg_wls_event_notifier_call(struct notifier_block *nb, unsigned
 		}
 		if (!strcmp(owner_ocm->desc->name, "usb")) {
 			wls_dev->usb_present = false;
-			schedule_delayed_work(&wls_dev->usb_int_work, 0);
+			queue_delayed_work(system_power_efficient_wq, &wls_dev->usb_int_work, 0);
 			if (wls_dev->wls_status.upgrade_fw_pending) {
 				wls_dev->wls_status.upgrade_fw_pending = false;
-				schedule_delayed_work(&wls_dev->wls_upgrade_fw_work, 0);
+				queue_delayed_work(system_power_efficient_wq, &wls_dev->wls_upgrade_fw_work, 0);
 			}
 		}
 		break;
@@ -2279,7 +2279,7 @@ static int oplus_chg_wls_event_notifier_call(struct notifier_block *nb, unsigned
 		if (!strcmp(owner_ocm->desc->name, "usb")) {
 			pr_info("usb present\n");
 			wls_dev->usb_present = true;
-			schedule_delayed_work(&wls_dev->usb_int_work, 0);
+			queue_delayed_work(system_power_efficient_wq, &wls_dev->usb_int_work, 0);
 			if (wls_dev->wls_ocm)
 				oplus_chg_mod_changed(wls_dev->wls_ocm);
 		}
@@ -2296,10 +2296,10 @@ static int oplus_chg_wls_event_notifier_call(struct notifier_block *nb, unsigned
 		adsp_started = true;
 		if (online_pending) {
 			online_pending = false;
-			schedule_delayed_work(&wls_dev->wls_connect_work, 0);
+			queue_delayed_work(system_power_efficient_wq, &wls_dev->wls_connect_work, 0);
 		} else {
 			if (get_boot_mode() != MSM_BOOT_MODE__CHARGE) {
-				schedule_delayed_work(&wls_dev->wls_upgrade_fw_work, 0);
+				queue_delayed_work(system_power_efficient_wq, &wls_dev->wls_upgrade_fw_work, 0);
 			} else {
 				pr_info("check connect\n");
 				wls_dev->wls_status.boot_online_keep = true;
@@ -2343,7 +2343,7 @@ static int oplus_chg_wls_mod_notifier_call(struct notifier_block *nb, unsigned l
 		wls_status->rx_online = true;
 		wls_status->online_keep = false;
 		if (adsp_started)
-			schedule_delayed_work(&wls_dev->wls_connect_work, 0);
+			queue_delayed_work(system_power_efficient_wq, &wls_dev->wls_connect_work, 0);
 		else
 			online_pending = true;
 		if (wls_dev->wls_ocm) {
@@ -2358,7 +2358,7 @@ static int oplus_chg_wls_mod_notifier_call(struct notifier_block *nb, unsigned l
 			break;
 		wls_status->rx_present = false;
 		wls_status->rx_online = false;
-		schedule_delayed_work(&wls_dev->wls_connect_work, 0);
+		queue_delayed_work(system_power_efficient_wq, &wls_dev->wls_connect_work, 0);
 		if (wls_dev->wls_ocm) {
 			oplus_chg_global_event(wls_dev->wls_ocm, OPLUS_CHG_EVENT_OFFLINE);
 			oplus_chg_mod_changed(wls_dev->wls_ocm);
@@ -2421,7 +2421,7 @@ static int oplus_chg_wls_mod_notifier_call(struct notifier_block *nb, unsigned l
 			pr_info("Restart the rx disable\n");
 			wls_dev->wls_status.online_keep = true;
 			vote(wls_dev->rx_disable_votable, RX_IIC_VOTER, true, 1, false);
-			schedule_delayed_work(&wls_dev->rx_iic_restore_work, msecs_to_jiffies(500));
+			queue_delayed_work(system_power_efficient_wq, &wls_dev->rx_iic_restore_work, msecs_to_jiffies(500));
 		}
 		break;
 	default:
@@ -2546,7 +2546,7 @@ static void oplus_chg_wls_connect_work(struct work_struct *work)
 		rerun_election(wls_dev->nor_fcc_votable, false);
 		vote(wls_dev->nor_icl_votable, USER_VOTER, true, 100, false);
 		rerun_election(wls_dev->nor_icl_votable, false);
-		schedule_delayed_work(&wls_dev->wls_data_update_work, 0);
+		queue_delayed_work(system_power_efficient_wq, &wls_dev->wls_data_update_work, 0);
 		queue_delayed_work(wls_dev->wls_wq, &wls_dev->wls_rx_sm_work, 0);
 		/* reset charger status */
 		vote(wls_dev->nor_out_disable_votable, USER_VOTER, true, 1, false);
@@ -2586,7 +2586,7 @@ static void oplus_chg_wls_connect_work(struct work_struct *work)
 		vote(wls_dev->rx_disable_votable, CONNECT_VOTER, false, 0, false);
 		oplus_chg_wls_reset_variables(wls_dev);
 		if (wls_status->online_keep) {
-			schedule_delayed_work(&wls_dev->online_keep_remove_work, msecs_to_jiffies(2000));
+			queue_delayed_work(system_power_efficient_wq, &wls_dev->online_keep_remove_work, msecs_to_jiffies(2000));
 		} else {
 			if (wls_dev->rx_wake_lock_on) {
 				pr_info("release rx_wake_lock\n");
@@ -3761,7 +3761,7 @@ static int oplus_chg_wls_rx_handle_state_epp(struct oplus_chg_wls *wls_dev)
 		if (rc < 0)
 			nor_input_curr_ma = wls_status->iout_ma;
 		if (icl_ma - nor_input_curr_ma < 300)
-			schedule_delayed_work(&wls_dev->wls_verity_work, msecs_to_jiffies(500));
+			queue_delayed_work(system_power_efficient_wq, &wls_dev->wls_verity_work, msecs_to_jiffies(500));
 	}
 
 	iout_ma = wls_status->iout_ma;
@@ -3903,7 +3903,7 @@ static int oplus_chg_wls_rx_handle_state_epp_plus(struct oplus_chg_wls *wls_dev)
 		if (rc < 0)
 			nor_input_curr_ma = wls_status->iout_ma;
 		if (icl_ma - nor_input_curr_ma < 300)
-			schedule_delayed_work(&wls_dev->wls_verity_work, msecs_to_jiffies(500));
+			queue_delayed_work(system_power_efficient_wq, &wls_dev->wls_verity_work, msecs_to_jiffies(500));
 	}
 
 	iout_ma = wls_status->iout_ma;
@@ -4141,7 +4141,7 @@ static int oplus_chg_wls_rx_handle_state_fast(struct oplus_chg_wls *wls_dev)
 	}
 
 	if (!wls_status->verity_started && (wls_status->fastchg_target_curr_ma - wls_status->iout_ma < WLS_CURR_ERR_MIN_MA)) {
-		schedule_delayed_work(&wls_dev->wls_verity_work, msecs_to_jiffies(500));
+		queue_delayed_work(system_power_efficient_wq, &wls_dev->wls_verity_work, msecs_to_jiffies(500));
 	}
 
 	rc = oplus_chg_wls_fast_temp_check(wls_dev);
@@ -4344,7 +4344,7 @@ static int oplus_chg_wls_rx_handle_state_ffc(struct oplus_chg_wls *wls_dev)
 	pr_err("wkcs: iout=%d, vout=%d, vrect=%d\n", iout_ma, vout_mv, vrect_mv);
 
 	if (!wls_status->verity_started)
-		schedule_delayed_work(&wls_dev->wls_verity_work, msecs_to_jiffies(500));
+		queue_delayed_work(system_power_efficient_wq, &wls_dev->wls_verity_work, msecs_to_jiffies(500));
 
 	return 4000;
 }
@@ -4448,7 +4448,7 @@ static int oplus_chg_wls_rx_handle_state_done(struct oplus_chg_wls *wls_dev)
 	pr_err("wkcs: iout=%d, vout=%d, vrect=%d\n", iout_ma, vout_mv, vrect_mv);
 
 	if (!wls_status->verity_started)
-		schedule_delayed_work(&wls_dev->wls_verity_work, msecs_to_jiffies(500));
+		queue_delayed_work(system_power_efficient_wq, &wls_dev->wls_verity_work, msecs_to_jiffies(500));
 
 	return wait_time_ms;
 }
@@ -4564,7 +4564,7 @@ out:
 		if (rc < 0)
 			nor_input_curr_ma = wls_status->iout_ma;
 		if (icl_ma - nor_input_curr_ma < 300)
-			schedule_delayed_work(&wls_dev->wls_verity_work, msecs_to_jiffies(500));
+			queue_delayed_work(system_power_efficient_wq, &wls_dev->wls_verity_work, msecs_to_jiffies(500));
 	}
 
 	return 4000;
@@ -4907,7 +4907,7 @@ static void oplus_chg_wls_trx_disconnect_work(struct work_struct *work)
 		retry_num++;
 		pr_err("can't disable trx, retry_num=%d, rc=%d\n", retry_num, rc);
 		if (retry_num < 5)
-			schedule_delayed_work(&wls_dev->wls_trx_disconnect_work, msecs_to_jiffies(100));
+			queue_delayed_work(system_power_efficient_wq, &wls_dev->wls_trx_disconnect_work, msecs_to_jiffies(100));
 		else
 			retry_num = 0;
 	}
@@ -5057,7 +5057,7 @@ out:
 err:
 	wls_status->trx_state = OPLUS_CHG_WLS_TRX_STATE_OFF;
 	err_count = 0;
-	schedule_delayed_work(&wls_dev->wls_trx_disconnect_work, 0);
+	queue_delayed_work(system_power_efficient_wq, &wls_dev->wls_trx_disconnect_work, 0);
 }
 
 static void oplus_chg_wls_upgrade_fw_work(struct work_struct *work)
@@ -5128,7 +5128,7 @@ out:
 		retry_num = 0;
 		return;
 	}
-	schedule_delayed_work(&wls_dev->wls_upgrade_fw_work, msecs_to_jiffies(1000));
+	queue_delayed_work(system_power_efficient_wq, &wls_dev->wls_upgrade_fw_work, msecs_to_jiffies(1000));
 }
 
 static void oplus_chg_wls_data_update_work(struct work_struct *work)
@@ -5236,7 +5236,7 @@ static void oplus_chg_wls_data_update_work(struct work_struct *work)
 	}
 
 out:
-	schedule_delayed_work(&wls_dev->wls_data_update_work, msecs_to_jiffies(500));
+	queue_delayed_work(system_power_efficient_wq, &wls_dev->wls_data_update_work, msecs_to_jiffies(500));
 }
 
 static void oplus_chg_wls_usb_connect_work(struct work_struct *work)
@@ -5289,7 +5289,7 @@ static void oplus_chg_wls_rx_verity_restore_work(struct work_struct *work)
 	struct oplus_chg_wls *wls_dev = container_of(dwork, struct oplus_chg_wls, rx_verity_restore_work);
 
 	vote(wls_dev->rx_disable_votable, VERITY_VOTER, false, 0, false);
-	schedule_delayed_work(&wls_dev->verity_state_remove_work, msecs_to_jiffies(10000));
+	queue_delayed_work(system_power_efficient_wq, &wls_dev->verity_state_remove_work, msecs_to_jiffies(10000));
 }
 
 static void oplus_chg_wls_rx_restart_work(struct work_struct *work)
@@ -5305,7 +5305,7 @@ static void oplus_chg_wls_rx_restart_work(struct work_struct *work)
 			return;
 		}
 		retry_count++;
-		schedule_delayed_work(&wls_dev->rx_restart_work, msecs_to_jiffies(500));
+		queue_delayed_work(system_power_efficient_wq, &wls_dev->rx_restart_work, msecs_to_jiffies(500));
 	}
 	if (!oplus_chg_wls_rx_is_connected(wls_dev->wls_rx)) {
 		pr_info("wireless charging is not connected\n");
@@ -5318,7 +5318,7 @@ static void oplus_chg_wls_rx_restart_work(struct work_struct *work)
 	msleep(1000);
 	vote(wls_dev->rx_disable_votable, USER_VOTER, false, 0, false);
 	if (READ_ONCE(wls_dev->wls_status.online_keep))
-		schedule_delayed_work(&wls_dev->online_keep_remove_work, msecs_to_jiffies(4000));
+		queue_delayed_work(system_power_efficient_wq, &wls_dev->online_keep_remove_work, msecs_to_jiffies(4000));
 }
 
 static void oplus_chg_wls_online_keep_remove_work(struct work_struct *work)
@@ -5425,7 +5425,7 @@ static irqreturn_t oplus_chg_wls_usb_int_handler(int irq, void *dev_id)
 {
 	struct oplus_chg_wls *wls_dev = dev_id;
 
-	schedule_delayed_work(&wls_dev->usb_connect_work, 0);
+	queue_delayed_work(system_power_efficient_wq, &wls_dev->usb_connect_work, 0);
 	return IRQ_HANDLED;
 }
 
@@ -6081,7 +6081,7 @@ static ssize_t oplus_chg_wls_proc_tx_read(struct file *file, char __user *buf, s
 	*/
 	if (wls_dev->wls_status.trx_close_delay) {
 		val.intval = OPLUS_CHG_WLS_TRX_STATUS_ENABLE;
-		schedule_delayed_work(&wls_dev->wls_clear_trx_work, msecs_to_jiffies(3000));
+		queue_delayed_work(system_power_efficient_wq, &wls_dev->wls_clear_trx_work, msecs_to_jiffies(3000));
 	}
 #endif
 	switch (val.intval) {
@@ -6774,7 +6774,7 @@ static int oplus_chg_wls_driver_probe(struct platform_device *pdev)
 	usb_present = oplus_chg_wls_is_usb_present(wls_dev);
 	if (usb_present) {
 		wls_dev->usb_present = true;
-		schedule_delayed_work(&wls_dev->usb_int_work, 0);
+		queue_delayed_work(system_power_efficient_wq, &wls_dev->usb_int_work, 0);
 	} else {
 		if (boot_mode == MSM_BOOT_MODE__CHARGE)
 			wls_dev->wls_status.boot_online_keep = true;

@@ -1023,7 +1023,7 @@ void oplus_warp_delay_reset_mcu_init(struct oplus_warp_chip *chip)
 
 static void oplus_warp_delay_reset_mcu(struct oplus_warp_chip *chip)
 {
-	schedule_delayed_work(&chip->delay_reset_mcu_work, round_jiffies_relative(msecs_to_jiffies(1500)));
+	queue_delayed_work(system_power_efficient_wq, &chip->delay_reset_mcu_work, round_jiffies_relative(msecs_to_jiffies(1500)));
 }
 
 static bool is_allow_fast_chg_real(struct oplus_warp_chip *chip)

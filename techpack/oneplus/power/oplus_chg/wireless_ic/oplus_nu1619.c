@@ -778,7 +778,7 @@ static void nu1619_self_reset(struct oplus_nu1619_ic *chip, bool to_BPP)
 {
 	chip->nu1619_chg_status.wpc_self_reset = to_BPP;
 	nu1619_set_vt_sleep_val(1);
-	schedule_delayed_work(&chip->nu1619_self_reset_work, round_jiffies_relative(msecs_to_jiffies(1000)));
+	queue_delayed_work(system_power_efficient_wq, &chip->nu1619_self_reset_work, round_jiffies_relative(msecs_to_jiffies(1000)));
 }
 /*
 static void nu1619_read_debug_registers(struct oplus_nu1619_ic *chip)
@@ -1005,7 +1005,7 @@ void nu1619_set_rtx_function(bool is_on)
 		nu1619_chip->nu1619_chg_status.wpc_dischg_status = WPC_DISCHG_STATUS_ON;
 
 		/*cancel_delayed_work_sync(&nu1619_chip->idt_dischg_work);*/
-		schedule_delayed_work(&nu1619_chip->idt_dischg_work, round_jiffies_relative(msecs_to_jiffies(200)));
+		queue_delayed_work(system_power_efficient_wq, &nu1619_chip->idt_dischg_work, round_jiffies_relative(msecs_to_jiffies(200)));
 	} else {
 		if (nu1619_chip->nu1619_chg_status.wpc_dischg_status == WPC_DISCHG_STATUS_OFF) {
 			chg_err("<~WPC~> Rtx function has already disabled!\n");
@@ -1785,7 +1785,7 @@ static int nu1619_get_tx_iout(struct oplus_nu1619_ic *chip)
 static void nu1619_begin_CEP_detect(struct oplus_nu1619_ic *chip)
 {
 	chip->nu1619_chg_status.CEP_ready = false;
-	schedule_delayed_work(&chip->nu1619_CEP_work, P922X_CEP_INTERVAL);
+	queue_delayed_work(system_power_efficient_wq, &chip->nu1619_CEP_work, P922X_CEP_INTERVAL);
 }
 
 static void nu1619_reset_CEP_flag(struct oplus_nu1619_ic *chip)
@@ -3524,14 +3524,14 @@ static void nu1619_idt_dischg_status(struct oplus_nu1619_ic *chip)
 			chip->nu1619_chg_status.tx_online = false;
 			chip->nu1619_chg_status.wpc_dischg_status = WPC_DISCHG_IC_READY;
 			rc = nu1619_write_cmd_D(chip, 0x07);
-			schedule_delayed_work(&chip->idt_dischg_work, 0);
+			queue_delayed_work(system_power_efficient_wq, &chip->idt_dischg_work, 0);
 		} else if (P922X_RTX_DIGITALPING & regdata[0] || P922X_RTX_ANALOGPING & regdata[0]) {
 			chip->nu1619_chg_status.tx_online = false;
 			if (WPC_DISCHG_IC_PING_DEVICE == chip->nu1619_chg_status.wpc_dischg_status) {
 				chg_err("<~WPC~>rtx func no device to be charged, ping device...\n");
 			} else {
 				chip->nu1619_chg_status.wpc_dischg_status = WPC_DISCHG_IC_PING_DEVICE;
-				schedule_delayed_work(&chip->idt_dischg_work, WPC_DISCHG_WAIT_DEVICE_EVENT);
+				queue_delayed_work(system_power_efficient_wq, &chip->idt_dischg_work, WPC_DISCHG_WAIT_DEVICE_EVENT);
 			}
 		} else if (P922X_RTX_TRANSFER & regdata[0]) {
 			chip->nu1619_chg_status.tx_online = true;
@@ -3833,7 +3833,7 @@ static void nu1619_idt_connect_int_func(struct work_struct *work)
 			chip->nu1619_chg_status.iout_debug_mode = false;
 #endif
 
-			schedule_delayed_work(&chip->nu1619_task_work, round_jiffies_relative(msecs_to_jiffies(100)));
+			queue_delayed_work(system_power_efficient_wq, &chip->nu1619_task_work, round_jiffies_relative(msecs_to_jiffies(100)));
 
 			oplus_chg_restart_update_work();
 #ifdef OPLUS_FEATURE_CHG_BASIC
@@ -3881,7 +3881,7 @@ static void nu1619_idt_connect_int_func(struct work_struct *work)
 				chg_err("<~WPC~>[-TEST-]charge test > 22s, stop charge!\n");
 				stop_timer = 0;
 				nu1619_set_vt_sleep_val(1);
-				schedule_delayed_work(&chip->nu1619_test_work, round_jiffies_relative(msecs_to_jiffies(1000)));
+				queue_delayed_work(system_power_efficient_wq, &chip->nu1619_test_work, round_jiffies_relative(msecs_to_jiffies(1000)));
 			} else {
 				chg_err("<~WPC~>[-TEST-]charge test <= 22s!\n");
 			}
@@ -3901,7 +3901,7 @@ static void nu1619_idt_event_shedule_work(void)
 	if (!nu1619_chip) {
 		chg_err(" nu1619_chip is NULL\n");
 	} else {
-		schedule_delayed_work(&nu1619_chip->idt_event_int_work, 0);
+		queue_delayed_work(system_power_efficient_wq, &nu1619_chip->idt_event_int_work, 0);
 	}
 }
 
@@ -3910,7 +3910,7 @@ static void nu1619_idt_connect_shedule_work(void)
 	if (!nu1619_chip) {
 		chg_err(" nu1619_chip is NULL\n");
 	} else {
-		schedule_delayed_work(&nu1619_chip->idt_connect_int_work, 0);
+		queue_delayed_work(system_power_efficient_wq, &nu1619_chip->idt_connect_int_work, 0);
 	}
 }
 
@@ -5026,7 +5026,7 @@ static void nu1619_task_work_process(struct work_struct *work)
 		if (idt_disconnect_cnt >= 2) {
 			if (nu1619_chip->nu1619_chg_status.charge_online) {
 				chg_err("<~WPC~> idt_connect has dispeared. exit wpc\n");
-				schedule_delayed_work(&nu1619_chip->idt_connect_int_work, 0);
+				queue_delayed_work(system_power_efficient_wq, &nu1619_chip->idt_connect_int_work, 0);
 			}
 		}
 
@@ -5056,10 +5056,10 @@ static void nu1619_task_work_process(struct work_struct *work)
 		case WPC_CHG_STATUS_FAST_CHARGING_FROM_CHARGER:
 		case WPC_CHG_STATUS_FTM_WORKING:
 		case WPC_CHG_STATUS_DECREASE_VOUT_FOR_RESTART:
-			schedule_delayed_work(&chip->nu1619_task_work, round_jiffies_relative(msecs_to_jiffies(500)));
+			queue_delayed_work(system_power_efficient_wq, &chip->nu1619_task_work, round_jiffies_relative(msecs_to_jiffies(500)));
 			break;
 		default:
-			schedule_delayed_work(&chip->nu1619_task_work, round_jiffies_relative(msecs_to_jiffies(100)));
+			queue_delayed_work(system_power_efficient_wq, &chip->nu1619_task_work, round_jiffies_relative(msecs_to_jiffies(100)));
 			break;
 		}
 	}
@@ -5074,7 +5074,7 @@ static void nu1619_CEP_work_process(struct work_struct *work)
 
 	if (nu1619_chip->nu1619_chg_status.charge_online) {
 		nu1619_detect_CEP(chip);
-		schedule_delayed_work(&chip->nu1619_CEP_work, P922X_CEP_INTERVAL);
+		queue_delayed_work(system_power_efficient_wq, &chip->nu1619_CEP_work, P922X_CEP_INTERVAL);
 	}
 }
 
@@ -5105,7 +5105,7 @@ static void nu1619_self_reset_process(struct work_struct *work)
 		chg_err("<~WPC~> self reset: enable connect again!\n");
 		nu1619_set_vt_sleep_val(0);
 		if (chip->nu1619_chg_status.wpc_self_reset) {
-			schedule_delayed_work(&chip->nu1619_self_reset_work, round_jiffies_relative(msecs_to_jiffies(4500)));
+			queue_delayed_work(system_power_efficient_wq, &chip->nu1619_self_reset_work, round_jiffies_relative(msecs_to_jiffies(4500)));
 		}
 	} else {
 		chg_err("<~WPC~> self reset: clear wpc_self_reset!\n");
@@ -5132,7 +5132,7 @@ static void nu1619_test_work_process(struct work_struct *work)
 		nu1619_set_vt_sleep_val(0);
 	} else {
 		chg_err("<~WPC~>[-TEST-] keep stop\n");
-		schedule_delayed_work(&chip->nu1619_test_work, round_jiffies_relative(msecs_to_jiffies(1000)));
+		queue_delayed_work(system_power_efficient_wq, &chip->nu1619_test_work, round_jiffies_relative(msecs_to_jiffies(1000)));
 	}
 }
 #endif
@@ -6987,7 +6987,7 @@ static int nu1619_driver_probe(struct i2c_client *client, const struct i2c_devic
 
 	nu1619_chip = chip;
 
-	schedule_delayed_work(&chip->nu1619_update_work, P922X_UPDATE_INTERVAL);
+	queue_delayed_work(system_power_efficient_wq, &chip->nu1619_update_work, P922X_UPDATE_INTERVAL);
 
 	if (g_oplus_chip && !g_oplus_chip->charger_exist)
 		nu1619_idt_connect_shedule_work();

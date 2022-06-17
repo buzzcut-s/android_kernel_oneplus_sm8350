@@ -100,7 +100,7 @@ int op_restart_modem(void)
     if (subsystem_restart("modem") == -ENODEV)
         pr_err("%s: SSR call failed\n", __func__);
 
-    schedule_delayed_work(&op_restart_modem_work,
+    queue_delayed_work(system_power_efficient_wq, &op_restart_modem_work,
             msecs_to_jiffies(10*1000));
     return 0;
 }

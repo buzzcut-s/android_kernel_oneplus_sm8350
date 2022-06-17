@@ -65,7 +65,7 @@ static void oplus_chg_wls_status_keep_clean_work(struct work_struct *work)
 		if (temp_val.intval == WLS_SK_BY_HAL) {
 			temp_val.intval = WLS_SK_WAIT_TIMEOUT;
 			oplus_chg_mod_set_property(ogdev->wls_ocm, OPLUS_CHG_PROP_STATUS_KEEP, &temp_val);
-			schedule_delayed_work(&ogdev->status_keep_clean_work, msecs_to_jiffies(5000));
+			queue_delayed_work(system_power_efficient_wq, &ogdev->status_keep_clean_work, msecs_to_jiffies(5000));
 			return;
 		}
 
@@ -117,12 +117,12 @@ static int wls_psy_get_prop(struct power_supply *psy, enum power_supply_property
 				temp_val.intval = WLS_SK_BY_KERNEL;
 				oplus_chg_mod_set_property(ogdev->wls_ocm, OPLUS_CHG_PROP_STATUS_KEEP, &temp_val);
 				pval->intval = 1;
-				schedule_delayed_work(&ogdev->status_keep_clean_work, msecs_to_jiffies(1000));
+				queue_delayed_work(system_power_efficient_wq, &ogdev->status_keep_clean_work, msecs_to_jiffies(1000));
 			} else {
 				ogdev->pre_wls_online = pval->intval;
 				if (ogdev->status_wake_lock_on) {
 					cancel_delayed_work_sync(&ogdev->status_keep_clean_work);
-					schedule_delayed_work(&ogdev->status_keep_clean_work, 0);
+					queue_delayed_work(system_power_efficient_wq, &ogdev->status_keep_clean_work, 0);
 				}
 			}
 		}
