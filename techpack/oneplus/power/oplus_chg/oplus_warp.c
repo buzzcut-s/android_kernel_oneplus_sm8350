@@ -908,7 +908,7 @@ static void oplus_warp_fastchg_func(struct work_struct *work)
 		return;
 	}
 
-	usleep_range(2000, 2000);
+	usleep_range(2000, 2000 * 1.2);
 	if (chip->vops->get_gpio_ap_data(chip) != 1) {
 		/*warp_xlog_printk(CHG_LOG_CRTI, "  Shield fastchg irq, return\r\n");*/
 		return;

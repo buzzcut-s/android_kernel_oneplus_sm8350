@@ -5435,7 +5435,7 @@ static void tp_load_lcd_node(struct work_struct *work)
 	ret = check_dt(ts->client->dev.of_node);
 	while (ret != 0 && retry_count--) {
 		TPD_INFO("check_dt fail, try again\n");
-		usleep_range(3000, 3000);
+		usleep_range(3000, 3000 * 1.2);
 		ret = check_dt(ts->client->dev.of_node);
 		if (ret == 0)
 			break;

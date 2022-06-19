@@ -80,9 +80,9 @@ int iris_sync_panel_brightness(int32_t step, void *phys_enc)
 		if (step <= 2) {
 			rc = c_conn->ops.set_backlight(&c_conn->base,
 					display, pcfg->panel_level);
-			usleep_range(pcfg->panel_delay, pcfg->panel_delay);
+			usleep_range(pcfg->panel_delay, pcfg->panel_delay * 1.2);
 		} else {
-			usleep_range(pcfg->panel_delay, pcfg->panel_delay);
+			usleep_range(pcfg->panel_delay, pcfg->panel_delay * 1.2);
 			rc = c_conn->ops.set_backlight(&c_conn->base,
 					display, pcfg->panel_level);
 		}
