@@ -132,7 +132,7 @@ int bq27541_read_i2c(int cmd, int *returnData)
 	if(gauge_ic->device_type == DEVICE_ZY0602 || cmd == BQ27541_BQ27411_REG_CNTL) {
 		if (*returnData < 0) {
 			while(retry > 0) {
-				usleep_range(5000, 5000);
+				usleep_range(5000, 5000 * 1.2);
 				*returnData = i2c_smbus_read_word_data(gauge_ic->client, cmd);
 				if (*returnData < 0) {
 					retry--;
@@ -966,7 +966,7 @@ static int bq28z610_get_device_chemistry(void)
 			mutex_lock(&bq28z610_alt_manufacturer_access);
 			bq27541_i2c_txsubcmd(BQ28Z610_DEVICE_CHEMISTRY_EN_ADDR,
 				BQ28Z610_DEVICE_CHEMISTRY_CMD);
-			usleep_range(1000, 1000);
+			usleep_range(1000, 1000 * 1.2);
 			ret = bq27541_read_i2c_block(BQ28Z610_DEVICE_CHEMISTRY_ADDR,
 				BQ28Z610_DEVICE_CHEMISTRY_SIZE, data);
 			mutex_unlock(&bq28z610_alt_manufacturer_access);
@@ -1011,7 +1011,7 @@ static int bq28z610_get_balancing_config(void)
 			mutex_lock(&bq28z610_alt_manufacturer_access);
 			bq27541_i2c_txsubcmd(BQ28Z610_OPERATION_STATUS_EN_ADDR,
 				BQ28Z610_OPERATION_STATUS_CMD);
-			usleep_range(1000, 1000);
+			usleep_range(1000, 1000 * 1.2);
 			ret = bq27541_read_i2c_block(BQ28Z610_OPERATION_STATUS_ADDR,
 				BQ28Z610_OPERATION_STATUS_SIZE, data);
 			mutex_unlock(&bq28z610_alt_manufacturer_access);
@@ -1514,10 +1514,10 @@ int bq27541_get_passedchg(int *val)
 			pr_err("%s enable block data control fail\n", __func__);
 			goto out;
 		}
-		usleep_range(5000, 5000);
+		usleep_range(5000, 5000 * 1.2);
 
 		bq27541_i2c_txsubcmd(BQ27411_DATA_CLASS_ACCESS, 0x0074);
-		usleep_range(10000, 10000);
+		usleep_range(10000, 10000 * 1.2);
 		rc = bq27541_read_i2c_onebyte(0x4E, &value);
 		if (rc) {
 			pr_err("%s read 0x4E fail\n", __func__);
@@ -1899,7 +1899,7 @@ static int sealed(void)
 
 	bq27541_cntl_cmd(CONTROL_STATUS);
 	/*    bq27541_cntl_cmd(di, CONTROL_STATUS);*/
-	usleep_range(10000, 10000);
+	usleep_range(10000, 10000 * 1.2);
 	bq27541_read_i2c(CONTROL_STATUS, &value);
 	/*    chg_debug(" REG_CNTL: 0x%x\n", value); */
 
@@ -1921,12 +1921,12 @@ static int seal(void)
 		return 1;
 	}
 	bq27541_cntl_cmd(SEAL_SUBCMD);
-	usleep_range(10000, 10000);
+	usleep_range(10000, 10000 * 1.2);
 	for (i = 0;i < SEAL_POLLING_RETRY_LIMIT;i++) {
 		if (sealed()) {
 			return 1;
 		}
-		usleep_range(10000, 10000);
+		usleep_range(10000, 10000 * 1.2);
 	}
 	return 0;
 }
@@ -1942,30 +1942,30 @@ static int unseal(u32 key)
 	if (gauge_ic->device_type == DEVICE_BQ27541 || gauge_ic->device_type == DEVICE_ZY0602) {
 		/*    bq27541_write(CONTROL_CMD, key & 0xFFFF, false, di);*/
 		bq27541_cntl_cmd(0x1115);
-		usleep_range(10000, 10000);
+		usleep_range(10000, 10000 * 1.2);
 		/*    bq27541_write(CONTROL_CMD, (key & 0xFFFF0000) >> 16, false, di);*/
 		bq27541_cntl_cmd(0x1986);
-		usleep_range(10000, 10000);
+		usleep_range(10000, 10000 * 1.2);
 	}
 	else if (gauge_ic->device_type == DEVICE_BQ27411) {
 		/*    bq27541_write(CONTROL_CMD, key & 0xFFFF, false, di);*/
 		bq27541_cntl_cmd(0x8000);
-		usleep_range(10000, 10000);
+		usleep_range(10000, 10000 * 1.2);
 		/*    bq27541_write(CONTROL_CMD, (key & 0xFFFF0000) >> 16, false, di);*/
 		bq27541_cntl_cmd(0x8000);
-		usleep_range(10000, 10000);
+		usleep_range(10000, 10000 * 1.2);
 	}
 	bq27541_cntl_cmd(0xffff);
-	usleep_range(10000, 10000);
+	usleep_range(10000, 10000 * 1.2);
 	bq27541_cntl_cmd(0xffff);
-	usleep_range(10000, 10000);
+	usleep_range(10000, 10000 * 1.2);
 
 	while (i < SEAL_POLLING_RETRY_LIMIT) {
 		i++;
 		if (!sealed()) {
 			break;
 		}
-		usleep_range(10000, 10000);
+		usleep_range(10000, 10000 * 1.2);
 	}
 
 out:
@@ -1986,9 +1986,9 @@ static int bq27411_write_block_data_cmd(struct chip_bq27541 *chip,
 	u8 old_value = 0, old_csum = 0, new_csum = 0;
 	/*u8 new_csum_test = 0, csum_temp = 0;*/
 
-	usleep_range(1000, 1000);
+	usleep_range(1000, 1000 * 1.2);
 	bq27541_i2c_txsubcmd(BQ27411_DATA_CLASS_ACCESS, block_id);
-	usleep_range(10000, 10000);
+	usleep_range(10000, 10000 * 1.2);
 	rc = bq27541_read_i2c_onebyte(reg_addr, &old_value);
 	if (rc) {
 		pr_err("%s read reg_addr = 0x%x fail\n", __func__, reg_addr);
@@ -1997,21 +1997,21 @@ static int bq27411_write_block_data_cmd(struct chip_bq27541 *chip,
 	if (old_value == new_value) {
 		return 0;
 	}
-	usleep_range(1000, 1000);
+	usleep_range(1000, 1000 * 1.2);
 	rc = bq27541_read_i2c_onebyte(BQ27411_CHECKSUM_ADDR, &old_csum);
 	if (rc) {
 		pr_err("%s read checksum fail\n", __func__);
 		return 1;
 	}
-	usleep_range(1000, 1000);
+	usleep_range(1000, 1000 * 1.2);
 	bq27541_i2c_txsubcmd_onebyte(reg_addr, new_value);
-	usleep_range(1000, 1000);
+	usleep_range(1000, 1000 * 1.2);
 	new_csum = (old_value + old_csum - new_value) & 0xff;
 /*
 	csum_temp = (255 - old_csum - old_value) % 256;
 	new_csum_test = 255 - ((csum_temp + new_value) % 256);
 */
-	usleep_range(1000, 1000);
+	usleep_range(1000, 1000 * 1.2);
 	bq27541_i2c_txsubcmd_onebyte(BQ27411_CHECKSUM_ADDR, new_csum);
 	pr_err("bq27411 write blk_id = 0x%x, addr = 0x%x, old_val = 0x%x, new_val = 0x%x, old_csum = 0x%x, new_csum = 0x%x\n",
 		block_id, reg_addr, old_value, new_value, old_csum, new_csum);
@@ -2023,9 +2023,9 @@ static int bq27411_read_block_data_cmd(struct chip_bq27541 *chip,
 {
 	u8 value = 0;
 
-	usleep_range(1000, 1000);
+	usleep_range(1000, 1000 * 1.2);
 	bq27541_i2c_txsubcmd(BQ27411_DATA_CLASS_ACCESS, block_id);
-	usleep_range(10000, 10000);
+	usleep_range(10000, 10000 * 1.2);
 	bq27541_read_i2c_onebyte(reg_addr, &value);
 	return value;
 }
@@ -2037,9 +2037,9 @@ static int bq27411_enable_config_mode(struct chip_bq27541 *chip, bool enable)
 	int rc = 0;
 
 	if (enable) {		/*enter config mode*/
-		usleep_range(1000, 1000);
+		usleep_range(1000, 1000 * 1.2);
 		bq27541_cntl_cmd(BQ27411_SUBCMD_SET_CFG);
-		usleep_range(1000, 1000);
+		usleep_range(1000, 1000 * 1.2);
 		for (i = 0; i < BQ27411_CONFIG_MODE_POLLING_LIMIT; i++) {
 			rc = bq27541_read_i2c(BQ27411_SUBCMD_CONFIG_MODE, &config_mode);
 			if (rc < 0) {
@@ -2052,9 +2052,9 @@ static int bq27411_enable_config_mode(struct chip_bq27541 *chip, bool enable)
 			msleep(50);
 		}
 	} else {		/* exit config mode */
-		usleep_range(1000, 1000);
+		usleep_range(1000, 1000 * 1.2);
 		bq27541_cntl_cmd(BQ27411_SUBCMD_EXIT_CFG);
-		usleep_range(1000, 1000);
+		usleep_range(1000, 1000 * 1.2);
 		for (i = 0; i < BQ27411_CONFIG_MODE_POLLING_LIMIT; i++) {
 			rc = bq27541_read_i2c(BQ27411_SUBCMD_CONFIG_MODE, &config_mode);
 			if (rc < 0) {
@@ -2115,7 +2115,7 @@ static bool bq27411_check_soc_smooth_parameter(struct chip_bq27541 *chip, bool i
 		pr_err("%s enable block data control fail\n", __func__);
 		goto check_error;
 	}
-	usleep_range(5000, 5000);
+	usleep_range(5000, 5000 * 1.2);
 	/*check cc-dead-band*/
 	value_read = bq27411_read_block_data_cmd(chip,
 		BQ27411_CC_DEAD_BAND_ID, BQ27411_CC_DEAD_BAND_ADDR);
@@ -2164,14 +2164,14 @@ static int bq27441_battery_full_param_write_cmd(struct chip_bq27541 *chip)
 	CNTL1_VAL_1[0] = 0x6C;
 	CNTL1_VAL_1[1] = 0x00;
 	bq27541_write_i2c_block(0x3E, 2, CNTL1_VAL_1);
-	usleep_range(15000,15000);
+	usleep_range(15000,15000 * 1.2);
 	pr_err("%s 0x3E -->write [0x%02x][0x%02x]\n", __func__, CNTL1_VAL_1[0], CNTL1_VAL_1[1]);
 
 	rc = bq27541_read_i2c_block(0x40, 2, read_buf);
 	pr_err("%s 0x40 -->read [0x%02x][0x%02x]\n", __func__, read_buf[0], read_buf[1]);
 	if(read_buf[0] == 0xFF && read_buf[1] == 0xBA){
 		rc = bq27541_read_i2c_onebyte(0x60, &reg_data);	
-		usleep_range(15000,15000);
+		usleep_range(15000,15000 * 1.2);
 		pr_err("%s 0x60 -->read [0x%02x]\n", __func__, reg_data);
 
 		CNTL1_VAL_1[0] = 0xFE;
@@ -2238,19 +2238,19 @@ static int bq27441_battery_full_param_write_cmd(struct chip_bq27541 *chip)
 											CNTL1_VAL_7[0] + CNTL1_VAL_7[1] + 
 											CNTL1_VAL_8[0] + CNTL1_VAL_8[1] + 
 											CNTL1_VAL_9[0] + CNTL1_VAL_9[1])));
-		usleep_range(30000,30000);
+		usleep_range(30000,30000 * 1.2);
 
 		CNTL1_VAL_1[0] = 0x52;
 		CNTL1_VAL_1[1] = 0x00;
 		bq27541_write_i2c_block(0x3E, 2, CNTL1_VAL_1);
-		usleep_range(15000,15000);
+		usleep_range(15000,15000 * 1.2);
 		pr_err("%s 0x3E -->write [0x%02x][0x%02x]\n", __func__, CNTL1_VAL_1[0], CNTL1_VAL_1[1]);
 	
 		rc = bq27541_read_i2c_block(0x5B, 2, read_buf);
 		pr_err("%s 0x5B -->read [0x%02x][0x%02x]\n", __func__, read_buf[0], read_buf[1]);
 
 		rc = bq27541_read_i2c_onebyte(0x60, &reg_data); 
-		usleep_range(15000,15000);
+		usleep_range(15000,15000 * 1.2);
 		pr_err("%s 0x60 -->read [0x%02x]\n", __func__, reg_data);
 
 		CNTL1_VAL_1[0] = 0x00;
@@ -2259,20 +2259,20 @@ static int bq27441_battery_full_param_write_cmd(struct chip_bq27541 *chip)
 		pr_err("%s 0x5B -->write [0x%02x][0x%02x]\n", __func__, CNTL1_VAL_1[0], CNTL1_VAL_1[1]);
 		bq27541_i2c_txsubcmd_onebyte(0x60, (read_buf[0] + read_buf[1] + reg_data - CNTL1_VAL_1[0] - CNTL1_VAL_1[1] ));
 		pr_err("%s 0x60 -->write [0x%02x]\n", __func__,(read_buf[0] + read_buf[1] + reg_data - CNTL1_VAL_1[0] - CNTL1_VAL_1[1] ));
-		usleep_range(15000,15000);
+		usleep_range(15000,15000 * 1.2);
 
 		CNTL1_VAL_1[0] = 0x52;
 		CNTL1_VAL_1[1] = 0x00;
-		usleep_range(15000,15000);
+		usleep_range(15000,15000 * 1.2);
 		bq27541_write_i2c_block(0x3E, 2, CNTL1_VAL_1);
-		usleep_range(15000,15000);
+		usleep_range(15000,15000 * 1.2);
 		pr_err("%s 0x3E -->write [0x%02x][0x%02x]\n", __func__, CNTL1_VAL_1[0], CNTL1_VAL_1[1]);
 	
 		rc = bq27541_read_i2c_block(0x5D, 2, read_buf);
 		pr_err("%s 0x5D -->read [0x%02x][0x%02x]\n", __func__, read_buf[0], read_buf[1]);
 
 		rc = bq27541_read_i2c_onebyte(0x60, &reg_data);	
-		usleep_range(15000,15000);
+		usleep_range(15000,15000 * 1.2);
 		pr_err("%s 0x60 -->read [0x%02x]\n", __func__, reg_data);
 
 		CNTL1_VAL_1[0] = 0x10;
@@ -2281,19 +2281,19 @@ static int bq27441_battery_full_param_write_cmd(struct chip_bq27541 *chip)
 		pr_err("%s 0x5D -->write [0x%02x][0x%02x]\n", __func__, CNTL1_VAL_1[0], CNTL1_VAL_1[1]);
 		bq27541_i2c_txsubcmd_onebyte(0x60, (read_buf[0] + read_buf[1] + reg_data - CNTL1_VAL_1[0] - CNTL1_VAL_1[1] ));
 		pr_err("%s 0x60 -->write [0x%02x]\n", __func__, (read_buf[0] + read_buf[1] + reg_data - CNTL1_VAL_1[0] - CNTL1_VAL_1[1] ));
-		usleep_range(15000,15000);
+		usleep_range(15000,15000 * 1.2);
 
 	
 		CNTL1_VAL_1[0] = 0x52;
 		CNTL1_VAL_1[1] = 0x00;
 		bq27541_write_i2c_block(0x3E, 2, CNTL1_VAL_1);
-		usleep_range(15000,15000);
+		usleep_range(15000,15000 * 1.2);
 		pr_err("%s 0x3E -->write [0x%02x][0x%02x]\n", __func__, CNTL1_VAL_1[0], CNTL1_VAL_1[1]);
 
 		rc = bq27541_read_i2c_block(0x56, 2, read_buf);
 		pr_err("%s 0x56 -->read [0x%02x][0x%02x]\n", __func__, read_buf[0], read_buf[1]);
 		rc = bq27541_read_i2c_onebyte(0x60, &reg_data);	
-		usleep_range(15000,15000);
+		usleep_range(15000,15000 * 1.2);
 		pr_err("%s 0x60 -->read [0x%02x]\n", __func__, reg_data);
 
 		CNTL1_VAL_1[0] = 0x00;
@@ -2302,18 +2302,18 @@ static int bq27441_battery_full_param_write_cmd(struct chip_bq27541 *chip)
 		pr_err("%s 0x56 -->write [0x%02x][0x%02x]\n", __func__, CNTL1_VAL_1[0], CNTL1_VAL_1[1]);
 		bq27541_i2c_txsubcmd_onebyte(0x60, (read_buf[0] + read_buf[1] + reg_data - CNTL1_VAL_1[0] - CNTL1_VAL_1[1] ));
 		pr_err("%s 0x60 -->write [0x%02x]\n", __func__,(read_buf[0] + read_buf[1] + reg_data - CNTL1_VAL_1[0] - CNTL1_VAL_1[1] ));
-		usleep_range(15000,15000);
+		usleep_range(15000,15000 * 1.2);
 
 		CNTL1_VAL_1[0] = 0x59;
 		CNTL1_VAL_1[1] = 0x00;
 		bq27541_write_i2c_block(0x3E, 2, CNTL1_VAL_1);
-		usleep_range(15000,15000);
+		usleep_range(15000,15000 * 1.2);
 		pr_err("%s 0x3E -->write [0x%02x][0x%02x]\n", __func__, CNTL1_VAL_1[0], CNTL1_VAL_1[1]);
 
 		rc = bq27541_read_i2c_block(0x40, 2, read_buf);
 		pr_err("%s 0x40 -->read [0x%02x][0x%02x]\n", __func__, read_buf[0], read_buf[1]);
 		rc = bq27541_read_i2c_onebyte(0x60, &reg_data);	
-		usleep_range(15000,15000);
+		usleep_range(15000,15000 * 1.2);
 		pr_err("%s 0x60 -->read [0x%02x]\n", __func__, reg_data);
 
 		CNTL1_VAL_1[0] = 0x00;
@@ -2322,13 +2322,13 @@ static int bq27441_battery_full_param_write_cmd(struct chip_bq27541 *chip)
 		pr_err("%s 0x40 -->write [0x%02x][0x%02x]\n", __func__, CNTL1_VAL_1[0], CNTL1_VAL_1[1]);
 		bq27541_i2c_txsubcmd_onebyte(0x60, (read_buf[0] + read_buf[1] + reg_data - CNTL1_VAL_1[0] - CNTL1_VAL_1[1] ));
 		pr_err("%s 0x60 -->write [0x%02x]\n", __func__,(read_buf[0] + read_buf[1] + reg_data - CNTL1_VAL_1[0] - CNTL1_VAL_1[1] ));
-		usleep_range(15000,15000);
+		usleep_range(15000,15000 * 1.2);
 	}
 
 	CNTL1_VAL_1[0] = 0x59;
 	CNTL1_VAL_1[1] = 0x00;
 	bq27541_write_i2c_block(0x3E, 2, CNTL1_VAL_1);
-	usleep_range(15000,15000);
+	usleep_range(15000,15000 * 1.2);
 	pr_err("%s 0x3E -->write [0x%02x][0x%02x]\n", __func__, CNTL1_VAL_1[0], CNTL1_VAL_1[1]);
 
 	rc = bq27541_read_i2c_block(0x40, 2, read_buf);
@@ -2337,7 +2337,7 @@ static int bq27441_battery_full_param_write_cmd(struct chip_bq27541 *chip)
 	if(read_buf[0] != 0x00 || read_buf[1] != 0x4b){
 		rc = bq27541_read_i2c_onebyte(0x60, &reg_data); 
 		pr_err("%s 0x60 -->read [0x%02x]\n", __func__, reg_data);
-		usleep_range(15000,15000);
+		usleep_range(15000,15000 * 1.2);
 
 		CNTL1_VAL_2[0] = 0x00;
 		CNTL1_VAL_2[1] = 0x4B;
@@ -2346,7 +2346,7 @@ static int bq27441_battery_full_param_write_cmd(struct chip_bq27541 *chip)
 
 		bq27541_i2c_txsubcmd_onebyte(0x60, (read_buf[0] + read_buf[1] + reg_data - CNTL1_VAL_2[0] - CNTL1_VAL_2[1] ));
 		pr_err("%s 0x60 -->write [0x%02x]\n", __func__,(read_buf[0] + read_buf[1] + reg_data - CNTL1_VAL_2[0] - CNTL1_VAL_2[1] ));
-		usleep_range(30000,30000);
+		usleep_range(30000,30000 * 1.2);
 		pr_err("%s end\n", __func__);
 	}
 
@@ -2383,13 +2383,13 @@ static int bq27411_write_soc_smooth_parameter(struct chip_bq27541 *chip, bool is
 	//only for wite battery full param in guage dirver probe on 7250 platform
 	if(chip->battery_full_param)
 	{
-		usleep_range(5000, 5000);
+		usleep_range(5000, 5000 * 1.2);
 		rc = bq27441_battery_full_param_write_cmd(chip);
 		if(rc == BATT_FULL_ERROR)
 			return BATT_FULL_ERROR;
 	}
 
-	usleep_range(5000, 5000);
+	usleep_range(5000, 5000 * 1.2);
 	/* step1: update cc-dead-band */
 	rc = bq27411_write_block_data_cmd(chip, BQ27411_CC_DEAD_BAND_ID,
 			BQ27411_CC_DEAD_BAND_ADDR, dead_band_val);
@@ -2455,9 +2455,9 @@ write_parameter:
 		}
 	}
 
-	usleep_range(1000, 1000);
+	usleep_range(1000, 1000 * 1.2);
 	if (sealed() == 0) {
-		usleep_range(1000, 1000);
+		usleep_range(1000, 1000 * 1.2);
 		seal();
 	}
 	pr_err("%s end\n", __func__);
@@ -2469,7 +2469,7 @@ static int bq8z610_sealed(void)
 	int value = 0;
 	u8 CNTL1_VAL[BQ28Z610_REG_CNTL1_SIZE] = {0,0,0,0};
 	bq27541_i2c_txsubcmd(BQ28Z610_REG_CNTL1, BQ28Z610_SEAL_STATUS);
-	usleep_range(10000, 10000);
+	usleep_range(10000, 10000 * 1.2);
 	bq27541_read_i2c_block(BQ28Z610_REG_CNTL1, BQ28Z610_REG_CNTL1_SIZE, CNTL1_VAL);
 	pr_err("%s bq8z610_sealed CNTL1_VAL[0] = %x,CNTL1_VAL[1] = %x,\
 		CNTL1_VAL[2] = %x,CNTL1_VAL[3] = %x,\n",
@@ -2500,7 +2500,7 @@ static int bq8z610_seal(void)
 			return 1;
 		}
 		//bq27541_i2c_txsubcmd(0, BQ28Z610_SEAL_SUBCMD);
-		usleep_range(10000, 10000);
+		usleep_range(10000, 10000 * 1.2);
 	}
 	return 0;
 }
@@ -2513,7 +2513,7 @@ static int bq8z610_unseal(void)
 		goto out;
 	}
 	bq27541_i2c_txsubcmd(0, BQ28Z610_UNSEAL_SUBCMD1);
-	usleep_range(10000, 10000);
+	usleep_range(10000, 10000 * 1.2);
 	//msleep(100);
 	bq27541_i2c_txsubcmd(0, BQ28Z610_UNSEAL_SUBCMD2);
 	//usleep_range(10000, 10000);
@@ -2523,7 +2523,7 @@ static int bq8z610_unseal(void)
 		if (!bq8z610_sealed()) {
 			break;
 		}
-		usleep_range(10000, 10000);
+		usleep_range(10000, 10000 * 1.2);
 	}
 
 out:
@@ -2677,9 +2677,9 @@ write_parameter:
 		tried_again = true;
 		goto write_parameter;
 	}
-	usleep_range(1000, 1000);
+	usleep_range(1000, 1000 * 1.2);
 	if (bq8z610_sealed() == 0) {
-		usleep_range(1000, 1000);
+		usleep_range(1000, 1000 * 1.2);
 		bq8z610_seal();
 	}
 	pr_err("%s end\n", __func__);
@@ -2733,7 +2733,7 @@ recfg_pararm1:
 		CNTL1_VAL_1[1] = 0x09;
 		bq27541_write_i2c_block(0x60, 2, CNTL1_VAL_1);													/*W*/
 		pr_err("%s 0x60 -->write [0x%02x][0x%02x]\n", __func__, CNTL1_VAL_1[0], CNTL1_VAL_1[1]);
-		usleep_range(260000,260000);																		/*15ms*/
+		usleep_range(260000,260000 * 1.2);																		/*15ms*/
 
 		CNTL1_VAL_1[0] = 0x9A;/*READ 10S*/
 		CNTL1_VAL_1[1] = 0x45;
@@ -2752,7 +2752,7 @@ recfg_pararm1:
 			goto recfg_pararm1;
 		}
 		retry_cnt = 0;
-		usleep_range(5000, 5000);
+		usleep_range(5000,5000 * 1.2);
 		/*##############################################0x5846#################################################*/
 		/*write 5846*/
 		pr_err("%s write 0x5846\n", __func__);
@@ -2780,7 +2780,7 @@ recfg_pararm2:
 		CNTL1_VAL_1[1] = 0x08;
 		bq27541_write_i2c_block(0x60, 2, CNTL1_VAL_1);													/*W*/
 		pr_err("%s 0x60 -->write [0x%02x][0x%02x]\n", __func__, CNTL1_VAL_1[0], CNTL1_VAL_1[1]);
-		usleep_range(260000, 260000);																		/*15ms*/
+		usleep_range(260000, 260000 * 1.2);																		/*15ms*/
 
 		CNTL1_VAL_1[0] = 0x58;/*READ 7200S 1C20*/
 		CNTL1_VAL_1[1] = 0x46;
@@ -2799,7 +2799,7 @@ recfg_pararm2:
 			goto recfg_pararm2;
 		}
 		retry_cnt = 0;
-		usleep_range(5000, 5000);
+		usleep_range(5000, 5000 * 1.2);
 		/*############################################0x0A47###################################################*/
 		/*write 0A47*/
 		pr_err("%s write 0x0A47\n", __func__);
@@ -2827,7 +2827,7 @@ recfg_pararm3:
 		CNTL1_VAL_1[1] = 0x08;
 		bq27541_write_i2c_block(0x60, 2, CNTL1_VAL_1);													/*W*/
 		pr_err("%s 0x60 -->write [0x%02x][0x%02x]\n", __func__, CNTL1_VAL_1[0], CNTL1_VAL_1[1]);
-		usleep_range(260000, 260000);																		/*15ms*/
+		usleep_range(260000, 260000 * 1.2);																		/*15ms*/
 
 		CNTL1_VAL_1[0] = 0x0A;/*READ 7200S 1C20*/
 		CNTL1_VAL_1[1] = 0x47;
@@ -2844,7 +2844,7 @@ recfg_pararm3:
 			pr_err("gauge err recfg_pararm3");
 			goto recfg_pararm3;
 		}
-		usleep_range(5000, 5000);
+		usleep_range(5000, 5000 * 1.2);
 		pr_err("gauge param cfg susccess\n");
 	}
 	pr_err("%s end\n", __func__);
@@ -2895,7 +2895,7 @@ write_parameter:
 	bq27541_i2c_txsubcmd(0, BQ28Z610_SEAL_SUBCMD);	/*seal*/
 	msleep(1000);
 	if (bq8z610_sealed() == 0) {
-		usleep_range(1000, 1000);
+		usleep_range(1000, 1000 * 1.2);
 		bq8z610_seal();
 	}
 	pr_err("%s end\n", __func__);
@@ -2949,7 +2949,7 @@ static int gauge_reg_dump(void) {
 		}
 
 		bq27541_i2c_txsubcmd(BQ27411_DATA_CLASS_ACCESS, 0x71);
-		usleep_range(10000, 10000);
+		usleep_range(10000, 10000 * 1.2);
 		bq27541_read_i2c_block(BQ28Z610_REG_CNTL1, 6, iv);
 		for (i = 2; i < 6 && sum < len - 16; i++) {
 			if ((i % 2) == 0) {
@@ -2959,7 +2959,7 @@ static int gauge_reg_dump(void) {
 			}
 		}
 		bq27541_i2c_txsubcmd(BQ27411_DATA_CLASS_ACCESS, 0x73);
-		usleep_range(10000, 10000);
+		usleep_range(10000, 10000 * 1.2);
 		bq27541_read_i2c_block(BQ28Z610_REG_CNTL1, 16, iv);
 		for (i = 2; i < 16 && sum < len - 16; i++) {
 			if (i != 3 && i != 4 && i != 7 && i != 8 && i != 11 && i != 12) {
@@ -2971,7 +2971,7 @@ static int gauge_reg_dump(void) {
 			}
 		}
 		bq27541_i2c_txsubcmd(BQ27411_DATA_CLASS_ACCESS, 0x74);
-		usleep_range(10000, 10000);
+		usleep_range(10000, 10000 * 1.2);
 		bq27541_read_i2c_block(BQ28Z610_REG_CNTL1, 26, iv);
 		for (i = 12; i < 26 && sum < len - 16; i++) {
 			if (i != 17 && i != 18) {
@@ -2983,7 +2983,7 @@ static int gauge_reg_dump(void) {
 			}
 		}
 		bq27541_i2c_txsubcmd(BQ27411_DATA_CLASS_ACCESS, 0x75);
-		usleep_range(10000, 10000);
+		usleep_range(10000, 10000 * 1.2);
 		bq27541_read_i2c_block(BQ28Z610_REG_CNTL1, 12, iv);
 		for (i = 2; i < 12 && sum < len - 16; i++) {
 			if(i != 3 && i != 5 && i != 6 && i != 8){
@@ -3057,9 +3057,9 @@ static void bq28z610_modify_dod0_parameter(struct chip_bq27541 *chip)
 		}
 	}
 	rc = bq28z610_write_dod0_parameter(chip);
-	usleep_range(1000, 1000);
+	usleep_range(1000, 1000 * 1.2);
 	if (bq8z610_sealed() == 0) {
-		usleep_range(1000, 1000);
+		usleep_range(1000, 1000 * 1.2);
 		bq8z610_seal();
 	}
 	pr_err("%s end\n", __func__);
@@ -3076,7 +3076,7 @@ static int bq28z610_get_2cell_voltage(void)
 	mutex_lock(&bq28z610_alt_manufacturer_access);
 	bq27541_i2c_txsubcmd(BQ28Z610_MAC_CELL_VOLTAGE_EN_ADDR,
 		BQ28Z610_MAC_CELL_VOLTAGE_CMD);
-	usleep_range(1000, 1000);
+	usleep_range(1000, 1000 * 1.2);
 	bq27541_read_i2c_block(BQ28Z610_MAC_CELL_VOLTAGE_ADDR,
 		BQ28Z610_MAC_CELL_VOLTAGE_SIZE, cell_vol);
 	mutex_unlock(&bq28z610_alt_manufacturer_access);

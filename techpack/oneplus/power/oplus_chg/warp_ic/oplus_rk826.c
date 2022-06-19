@@ -1288,7 +1288,7 @@ update_asic_fw:
 			oplus_i2c_dma_write(chip->client, REG_SLAVE, 4, (u8 *)(&force_dis_update_flag));
 			msleep(10);
 			oplus_i2c_dma_write(chip->client, REG_RESET, 4, (u8 *)(&sw_reset_flag));
-			usleep_range(1000000, 1000000);
+			usleep_range(1000000, 1000000 * 1.2);
 			rc = oplus_i2c_dma_read(chip->client, 0x52cc, 4, value_buf);
 			pr_err("rk826 read register 0x52cc rc = %d\n", rc);
 			if ((value_buf[0] == 0x45) && (value_buf[1] == 0x4c) &&
@@ -1380,7 +1380,7 @@ update_asic_fw:
 			oplus_i2c_dma_write(chip->client, REG_SLAVE, 4, (u8 *)(&force_dis_update_flag));
 			msleep(10);
 			oplus_i2c_dma_write(chip->client, REG_RESET, 4, (u8 *)(&sw_reset_flag));
-			usleep_range(1000000, 1000000);
+			usleep_range(1000000, 1000000 * 1.2);
 			rc = oplus_i2c_dma_read(chip->client, 0x52cc, 4, value_buf);
 			pr_err("rk826 read register 0x52cc rc = %d\n", rc);
 			if ((value_buf[0] == 0x45) && (value_buf[1] == 0x4c) &&
@@ -1422,7 +1422,7 @@ int rk826_asic_fw_status(struct oplus_warp_chip *chip){
 	oplus_i2c_dma_write(chip->client, REG_SLAVE, 4, (u8 *)(&force_dis_update_flag));
 	msleep(10);
 	oplus_i2c_dma_write(chip->client, REG_RESET, 4, (u8 *)(&sw_reset_flag));
-	usleep_range(1000000, 1000000);
+	usleep_range(1000000, 1000000 * 1.2);
 	rc = oplus_i2c_dma_read(chip->client, 0x52cc, 4, value_buf);
 	pr_err("rk826 read register 0x52cc rc = %d\n", rc);
 	if ((value_buf[0] == 0x45) && (value_buf[1] == 0x4c) &&

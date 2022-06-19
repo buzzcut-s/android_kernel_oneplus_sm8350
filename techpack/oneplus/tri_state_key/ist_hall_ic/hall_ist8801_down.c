@@ -573,7 +573,7 @@ static int ist8801_set_operation_mode(ist8801_data_t *ist8801_data, int mode)
 		ret = ist8801_i2c_write_block(ist8801_data, IST8801_REG_ACTION, &opf,1);
 
 		//delay for 5 ms
-		usleep_range(5000,5000);
+		usleep_range(5000,5000 * 1.2);
 
 		// set Standby mode
 		opf = 0x00;
@@ -595,7 +595,7 @@ static int ist8801_set_operation_mode(ist8801_data_t *ist8801_data, int mode)
 		//IST8801_REG_ACTION is 0x20
 		ret = ist8801_i2c_write_block(ist8801_data, IST8801_REG_ACTION, &opf,1);
 		//delay for 5 ms
-		usleep_range(5000,5000);
+		usleep_range(5000,5000 * 1.2);
 
 		// set Standby mode
 		opf = 0x00;
@@ -629,7 +629,7 @@ static int ist8801_set_operation_mode(ist8801_data_t *ist8801_data, int mode)
 		TRI_KEY_ERR("operation mode :OPERATION_MODE_SUSPEND \n");
 
 		//delay for 5 ms
-		usleep_range(5000,5000);
+		usleep_range(5000,5000 * 1.2);
 		break;
 	}
 

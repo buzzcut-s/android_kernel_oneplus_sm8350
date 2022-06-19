@@ -722,7 +722,7 @@ int oplus_warp_asic_hwid_check(struct oplus_warp_chip *chip)
 	pinctrl_select_state(chip->warp_gpio.pinctrl,
 		chip->warp_gpio.gpio_warp_asic_id_sleep);
 
-	usleep_range(10000, 10000);
+	usleep_range(10000, 10000 * 1.2);
 	if(gpio_get_value(chip->warp_gpio.warp_asic_id_gpio) == 1) {
 		chg_debug("it is  rk826\n");
 		asic_hwid_type = OPLUS_WARP_ASIC_HWID_RK826;
@@ -732,7 +732,7 @@ int oplus_warp_asic_hwid_check(struct oplus_warp_chip *chip)
 	pinctrl_select_state(chip->warp_gpio.pinctrl,
 		chip->warp_gpio.gpio_warp_asic_id_active);
 
-	usleep_range(10000, 10000);
+	usleep_range(10000, 10000 * 1.2);
 	if(gpio_get_value(chip->warp_gpio.warp_asic_id_gpio) == 1) {
 		chg_debug("it is  rt5125\n");
 		asic_hwid_type = OPLUS_WARP_ASIC_HWID_RT5125;
@@ -812,7 +812,7 @@ int oplus_warp_mcu_hwid_check(struct oplus_warp_chip *chip)
 	pinctrl_select_state(chip->warp_gpio.pinctrl,
 		chip->warp_gpio.gpio_warp_mcu_id_default);
 
-	usleep_range(10000, 10000);
+	usleep_range(10000, 10000 * 1.2);
 	if (gpio_is_valid(chip->warp_gpio.warp_mcu_id_gpio)){
 		if(gpio_get_value(chip->warp_gpio.warp_mcu_id_gpio) == 0){
 			chg_debug("it is  n76e\n");
@@ -1006,16 +1006,16 @@ void opchg_set_reset_sleep(struct oplus_warp_chip *chip)
 	mutex_lock(&chip->pinctrl_mutex);
 	gpio_direction_output(chip->warp_gpio.switch1_gpio, 0);	/* in 0*/
 	gpio_direction_output(chip->warp_gpio.reset_gpio, 0); /* out 0 */
-	usleep_range(10000, 10000);
+	usleep_range(10000, 10000 * 1.2);
 #ifdef CONFIG_OPLUS_CHARGER_MTK
 	pinctrl_select_state(chip->warp_gpio.pinctrl, chip->warp_gpio.gpio_reset_sleep); /* PULL_down */
 #else
 	pinctrl_select_state(chip->warp_gpio.pinctrl, chip->warp_gpio.gpio_reset_active); /* PULL_up */
 #endif
 	gpio_set_value(chip->warp_gpio.reset_gpio, 1);
-	usleep_range(10000, 10000);
+	usleep_range(10000, 10000 * 1.2);
 	gpio_direction_output(chip->warp_gpio.reset_gpio, 0); /* out 0 */
-	usleep_range(1000, 1000);
+	usleep_range(1000, 1000 * 1.2);
 	mutex_unlock(&chip->pinctrl_mutex);
 	chg_debug("%s\n", __func__);
 }
@@ -1075,11 +1075,11 @@ void opchg_set_reset_active_force(struct oplus_warp_chip *chip)
 #endif
 
 	gpio_set_value(chip->warp_gpio.reset_gpio, active_level);
-	usleep_range(10000, 10000);
+	usleep_range(10000, 10000 * 1.2);
 	gpio_set_value(chip->warp_gpio.reset_gpio, sleep_level);
-	usleep_range(10000, 10000);
+	usleep_range(10000, 10000 * 1.2);
 	gpio_set_value(chip->warp_gpio.reset_gpio, active_level);
-	usleep_range(2500, 2500);
+	usleep_range(2500, 2500 * 1.2);
 	if (chip->dpdm_switch_mode == WARP_CHARGER_MODE) {
 		gpio_direction_output(chip->warp_gpio.switch1_gpio, 1);	/* in 1*/
 	}
@@ -1409,9 +1409,9 @@ int opchg_read_ap_data(struct oplus_warp_chip *chip)
 {
 	int bit = 0;
 	opchg_set_clock_active(chip);
-	usleep_range(1000, 1000);
+	usleep_range(1000, 1000 * 1.2);
 	opchg_set_clock_sleep(chip);
-	usleep_range(19000, 19000);
+	usleep_range(19000, 19000 * 1.2);
 	bit = gpio_get_value(chip->warp_gpio.data_gpio);
 	return bit;
 }
@@ -1438,25 +1438,25 @@ void opchg_reply_mcu_data(struct oplus_warp_chip *chip, int ret_info, int device
 				gpio_set_value(chip->warp_gpio.data_gpio, (ret_info >> (reply_counts - i - 1)) & 0x01);
 				chg_err("send_bit[%d] = %d\n", i, (ret_info >> (reply_counts - i - 1)) & 0x01);
 				opchg_set_clock_active(chip);
-				usleep_range(1000, 1000);
+				usleep_range(1000, 1000 * 1.2);
 				opchg_set_clock_sleep(chip);
-				usleep_range(19000, 19000);
+				usleep_range(19000, 19000 * 1.2);
 		}
 		gpio_set_value(chip->warp_gpio.data_gpio, device_type);
 		chg_err("i=%d, device_type = %d\n", i, device_type);
 		opchg_set_clock_active(chip);
-		usleep_range(1000, 1000);
+		usleep_range(1000, 1000 * 1.2);
 		opchg_set_clock_sleep(chip);
-		usleep_range(19000, 19000);
+		usleep_range(19000, 19000 * 1.2);
 	} else {
 		chip->w_soc_temp_to_mcu = false;
 		for (i = 0; i < reply_counts; i++) {
 				gpio_set_value(chip->warp_gpio.data_gpio, (ret_info >> (reply_counts - i - 1)) & 0x01);
 				chg_err("send_bit[%d] = %d\n", i, (ret_info >> (reply_counts - i - 1)) & 0x01);
 				opchg_set_clock_active(chip);
-				usleep_range(1000, 1000);
+				usleep_range(1000, 1000 * 1.2);
 				opchg_set_clock_sleep(chip);
-				usleep_range(19000, 19000);
+				usleep_range(19000, 19000 * 1.2);
 		}
 	}
 }
@@ -1481,9 +1481,9 @@ void opchg_reply_mcu_data_4bits
 			chg_err("device_type = %d\n", device_type);
 		}
 		opchg_set_clock_active(chip);
-		usleep_range(1000, 1000);
+		usleep_range(1000, 1000 * 1.2);
 		opchg_set_clock_sleep(chip);
-		usleep_range(19000, 19000);
+		usleep_range(19000, 19000 * 1.2);
 	}
 }
 
@@ -1586,7 +1586,7 @@ void opchg_set_switch_mode(struct oplus_warp_chip *chip, int mode)
 					chg_err(" warp mode, switch1_gpio:%d\n", gpio_get_value(chip->warp_gpio.switch1_gpio));
 					break;
 				}
-				usleep_range(5000,5000);
+				usleep_range(5000,5000 * 1.2);
 			} while((--retry > 0));
 			break;
 		} else {

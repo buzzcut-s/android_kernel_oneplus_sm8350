@@ -230,7 +230,7 @@ int sde_rot_enable_vreg(struct sde_vreg *in_vreg, int num_vreg, int enable)
 			need_sleep = !regulator_is_enabled(in_vreg[i].vreg);
 			if (in_vreg[i].pre_on_sleep && need_sleep)
 				usleep_range(in_vreg[i].pre_on_sleep * 1000,
-					in_vreg[i].pre_on_sleep * 1000);
+					in_vreg[i].pre_on_sleep * 1000 * 1.2);
 			rc = regulator_set_load(in_vreg[i].vreg,
 				in_vreg[i].enable_load);
 			if (rc < 0) {
@@ -242,7 +242,7 @@ int sde_rot_enable_vreg(struct sde_vreg *in_vreg, int num_vreg, int enable)
 			rc = regulator_enable(in_vreg[i].vreg);
 			if (in_vreg[i].post_on_sleep && need_sleep)
 				usleep_range(in_vreg[i].post_on_sleep * 1000,
-					in_vreg[i].post_on_sleep * 1000);
+					in_vreg[i].post_on_sleep * 1000 * 1.2);
 			if (rc < 0) {
 				DEV_ERR("%pS->%s: %s enable failed\n",
 					__builtin_return_address(0), __func__,
@@ -254,11 +254,11 @@ int sde_rot_enable_vreg(struct sde_vreg *in_vreg, int num_vreg, int enable)
 		for (i = num_vreg-1; i >= 0; i--) {
 			if (in_vreg[i].pre_off_sleep)
 				usleep_range(in_vreg[i].pre_off_sleep * 1000,
-					in_vreg[i].pre_off_sleep * 1000);
+					in_vreg[i].pre_off_sleep * 1000 * 1.2);
 			regulator_disable(in_vreg[i].vreg);
 			if (in_vreg[i].post_off_sleep)
 				usleep_range(in_vreg[i].post_off_sleep * 1000,
-					in_vreg[i].post_off_sleep * 1000);
+					in_vreg[i].post_off_sleep * 1000 * 1.2);
 			regulator_set_load(in_vreg[i].vreg,
 				in_vreg[i].disable_load);
 		}
@@ -272,11 +272,11 @@ vreg_set_opt_mode_fail:
 	for (i--; i >= 0; i--) {
 		if (in_vreg[i].pre_off_sleep)
 			usleep_range(in_vreg[i].pre_off_sleep * 1000,
-				in_vreg[i].pre_off_sleep * 1000);
+				in_vreg[i].pre_off_sleep * 1000 * 1.2);
 		regulator_disable(in_vreg[i].vreg);
 		if (in_vreg[i].post_off_sleep)
 			usleep_range(in_vreg[i].post_off_sleep * 1000,
-				in_vreg[i].post_off_sleep * 1000);
+				in_vreg[i].post_off_sleep * 1000 * 1.2);
 		regulator_set_load(in_vreg[i].vreg,
 			in_vreg[i].disable_load);
 	}

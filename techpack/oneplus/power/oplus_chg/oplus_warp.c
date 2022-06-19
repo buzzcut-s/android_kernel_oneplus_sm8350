@@ -932,7 +932,7 @@ static void oplus_warp_fastchg_func(struct work_struct *work)
 		return;
 	}
 
-	usleep_range(2000, 2000);
+	usleep_range(2000, 2000 * 1.2);
 	if (chip->vops->get_gpio_ap_data(chip) != 1) {
 		/*warp_xlog_printk(CHG_LOG_CRTI, "  Shield fastchg irq, return\r\n");*/
 		return;
@@ -1567,11 +1567,11 @@ static void oplus_warp_fastchg_func(struct work_struct *work)
 out:
 	chip->vops->set_data_active(chip);
 	chip->vops->set_clock_active(chip);
-	usleep_range(10000, 10000);
+	usleep_range(10000, 10000 * 1.2);
 	chip->vops->set_clock_sleep(chip);
-	usleep_range(25000, 25000);
+	usleep_range(25000, 25000 * 1.2);
 	if (chip->fastchg_batt_temp_status == BAT_TEMP_EXIT) {
-		usleep_range(350000, 350000);
+		usleep_range(350000, 350000 * 1.2);
 		chip->allow_reading = true;
 		chip->fastchg_ing = false;
 		chip->fastchg_to_normal = false;
@@ -1592,7 +1592,7 @@ out:
 #ifdef OPLUS_CHG_OP_DEF
 		usleep_range(1200000, 1200000);
 #else
-		usleep_range(350000, 350000);
+		usleep_range(350000, 350000 * 1.2);
 #endif
 		chip->allow_reading = true;
 		chip->fastchg_ing = false;
@@ -1607,7 +1607,7 @@ out:
 			charger_abnormal_log = CRITICAL_LOG_WARP_BAD_CONNECTED;
 	} else if (data == WARP_NOTIFY_LOW_TEMP_FULL) {
 		if (oplus_warp_get_reply_bits() != 7) {
-			usleep_range(350000, 350000);
+			usleep_range(350000, 350000 * 1.2);
 			chip->allow_reading = true;
 			chip->fastchg_ing = false;
 			chip->fastchg_low_temp_full = true;
@@ -1620,7 +1620,7 @@ out:
 			chip->fastchg_to_warm = false;
 		}
 	} else if (data == WARP_NOTIFY_TEMP_OVER) {
-		usleep_range(350000, 350000);
+		usleep_range(350000, 350000 * 1.2);
 		chip->fastchg_ing = false;
 		chip->fastchg_to_warm = true;
 		chip->allow_reading = true;
