@@ -4042,8 +4042,8 @@ void ufshpb_suspend(struct ufsf_feature *ufsf)
 	seq_scan_lu(lun) {
 		hpb = ufsf->hpb_lup[lun];
 		if (hpb) {
-			INFO_MSG("ufshpb_lu %d goto suspend", lun);
-			INFO_MSG("ufshpb_lu %d changes suspend state", lun);
+			// INFO_MSG("ufshpb_lu %d goto suspend", lun);
+			// INFO_MSG("ufshpb_lu %d changes suspend state", lun);
 			ufshpb_set_state(ufsf, HPB_SUSPEND);
 			ufshpb_cancel_jobs(hpb);
 		}
@@ -4067,8 +4067,8 @@ void ufshpb_resume(struct ufsf_feature *ufsf)
 			do_retry_work =
 				!list_empty_careful(&hpb->lh_map_req_retry);
 
-			INFO_MSG("ufshpb_lu %d resume. do_task_work %d retry %d",
-				 lun, do_task_work, do_retry_work);
+			// INFO_MSG("ufshpb_lu %d resume. do_task_work %d retry %d",
+			//	 lun, do_task_work, do_retry_work);
 
 			if (do_task_work)
 				schedule_work(&hpb->task_work);
