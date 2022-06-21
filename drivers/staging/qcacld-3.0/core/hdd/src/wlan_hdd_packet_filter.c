@@ -34,7 +34,7 @@ int hdd_enable_default_pkt_filters(struct hdd_adapter *adapter)
 
 	hdd_ctx = WLAN_HDD_GET_CTX(adapter);
 	if (!hdd_ctx) {
-		hdd_err("HDD context is Null!!!");
+		hdd_debug("HDD context is Null!!!");
 		return -EINVAL;
 	}
 	if (hdd_ctx->user_configured_pkt_filter_rules) {

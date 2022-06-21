@@ -1043,27 +1043,27 @@ static int oplus_chg_intf_usb_mod_notifier_call(struct notifier_block *nb, unsig
 		schedule_work(&op_dev->otg_disable_work);
 		break;
 	case OPLUS_CHG_EVENT_LCD_ON:
-		pr_info("lcd on\n");
+		pr_debug("lcd on\n");
 		oplus_chg_set_led_status(true);
 		break;
 	case OPLUS_CHG_EVENT_LCD_OFF:
-		pr_info("lcd off\n");
+		pr_debug("lcd off\n");
 		oplus_chg_set_led_status(false);
 		break;
 	case OPLUS_CHG_EVENT_CALL_ON:
-		pr_info("call on\n");
+		pr_debug("call on\n");
 		chip->calling_on = true;
 		break;
 	case OPLUS_CHG_EVENT_CALL_OFF:
-		pr_info("call off\n");
+		pr_debug("call off\n");
 		chip->calling_on = false;
 		break;
 	case OPLUS_CHG_EVENT_CAMERA_ON:
-		pr_info("camera on\n");
+		pr_debug("camera on\n");
 		oplus_chg_set_camera_status(true);
 		break;
 	case OPLUS_CHG_EVENT_CAMERA_OFF:
-		pr_info("camera off\n");
+		pr_debug("camera off\n");
 		oplus_chg_set_camera_status(false);
 		break;
 #ifdef OPLUS_CHG_REG_DUMP_ENABLE
@@ -1858,16 +1858,16 @@ static int oplus_chg_intf_batt_mod_notifier_call(struct notifier_block *nb, unsi
 {
 	switch (val) {
 	case OPLUS_CHG_EVENT_LCD_ON:
-		pr_info("lcd on\n");
+		pr_debug("lcd on\n");
 		break;
 	case OPLUS_CHG_EVENT_LCD_OFF:
-		pr_info("lcd off\n");
+		pr_debug("lcd off\n");
 		break;
 	case OPLUS_CHG_EVENT_CALL_ON:
-		pr_info("call on\n");
+		pr_debug("call on\n");
 		break;
 	case OPLUS_CHG_EVENT_CALL_OFF:
-		pr_info("call off\n");
+		pr_debug("call off\n");
 		break;
 	default:
 		break;

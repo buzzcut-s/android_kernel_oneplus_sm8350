@@ -2629,7 +2629,7 @@ void sde_crtc_complete_commit(struct drm_crtc *crtc,
 		if (old_cstate->fingerprint_pressed != cstate->fingerprint_pressed) {
 			blank = cstate->fingerprint_pressed;
 			notifier_data.data = &blank;
-			pr_err("fingerprint status: %s",
+			pr_debug("fingerprint status: %s",
 			       blank ? "pressed" : "up");
 			SDE_ATRACE_BEGIN("press_event_notify");
             //if (lcd_active_panel)
@@ -2801,7 +2801,7 @@ ssize_t notify_aod_store(struct device *dev,
 		return count;
 		}
 
-	pr_err("notify aod hid %d\n", onscreenaod_hid );
+	pr_debug("notify aod hid %d\n", onscreenaod_hid );
 	oneplus_onscreenaod_hid = onscreenaod_hid;
 	SDE_ATRACE_END("aod_hid_node");
 	return count;
@@ -2846,7 +2846,7 @@ ssize_t notify_fppress_store(struct device *dev,
 		return count;
 		}
 
-	pr_err("notify fingerpress %d\n", onscreenfp_status );
+	pr_debug("notify fingerpress %d\n", onscreenfp_status );
 	oneplus_onscreenfp_status = onscreenfp_status;
 
 	drm_modeset_lock_all(drm_dev);
@@ -2905,7 +2905,7 @@ ssize_t notify_dim_store(struct device *dev,
 	sscanf(buf, "%du", &dim_status);
 
 	if(dsi_display->panel->aod_status==0 && (dim_status == 2)){
-		pr_err("fp set it in normal status\n");
+		pr_debug("fp set it in normal status\n");
 		if (dim_status == oneplus_dim_status)
 			return count;
 		oneplus_dim_status = dim_status;
@@ -2928,15 +2928,15 @@ ssize_t notify_dim_store(struct device *dev,
 	if (dim_status == oneplus_dim_status)
 		return count;
 	oneplus_dim_status = dim_status;
-	pr_err("notify dim %d,aod = %d press= %d aod_hide =%d\n",
+	pr_debug("notify dim %d,aod = %d press= %d aod_hide =%d\n",
 		oneplus_dim_status, dsi_display->panel->aod_status, oneplus_onscreenfp_status, aod_layer_hide);
 	if (oneplus_dim_status == 1 && HBM_flag) {
 		rc = dsi_panel_tx_cmd_set(dsi_display->panel, DSI_CMD_SET_HBM_ON_5);
 		if (rc) {
-			pr_err("failed to send DSI_CMD_SET_HBM_ON_5 cmds, rc=%d\n", rc);
+			pr_debug("failed to send DSI_CMD_SET_HBM_ON_5 cmds, rc=%d\n", rc);
 			return rc;
 		}
-		pr_err("Notify dim not commit,send DSI_CMD_SET_HBM_ON_5 cmds\n");
+		pr_debug("Notify dim not commit,send DSI_CMD_SET_HBM_ON_5 cmds\n");
 		return count;
 	}
 	drm_modeset_lock_all(drm_dev);

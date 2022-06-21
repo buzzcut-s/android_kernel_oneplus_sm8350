@@ -185,7 +185,7 @@ static void hdd_enable_gtk_offload(struct hdd_adapter *adapter)
 
 	vdev = hdd_objmgr_get_vdev(adapter);
 	if (!vdev) {
-		hdd_err("vdev is NULL");
+		hdd_debug("vdev is NULL");
 		return;
 	}
 

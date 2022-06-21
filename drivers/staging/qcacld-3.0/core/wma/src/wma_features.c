@@ -1621,10 +1621,8 @@ static void wma_inc_wow_stats(t_wma_handle *wma,
 
 static void wma_wow_stats_display(struct wake_lock_stats *stats)
 {
-	wma_conditional_log(is_wakeup_event_console_logs_enabled,
-			    "WLAN wake reason counters:");
-	wma_conditional_log(is_wakeup_event_console_logs_enabled,
-			    "uc:%d bc:%d v4_mc:%d v6_mc:%d ra:%d ns:%d na:%d "
+	wma_debug("WLAN wake reason counters:");
+	wma_debug("uc:%d bc:%d v4_mc:%d v6_mc:%d ra:%d ns:%d na:%d "
 			    "icmp:%d icmpv6:%d",
 			    stats->ucast_wake_up_count,
 			    stats->bcast_wake_up_count,
@@ -1636,8 +1634,7 @@ static void wma_wow_stats_display(struct wake_lock_stats *stats)
 			    stats->icmpv4_count,
 			    stats->icmpv6_count);
 
-	wma_conditional_log(is_wakeup_event_console_logs_enabled,
-			    "assoc:%d disassoc:%d assoc_resp:%d reassoc:%d "
+	wma_debug("assoc:%d disassoc:%d assoc_resp:%d reassoc:%d "
 			    "reassoc_resp:%d auth:%d deauth:%d action:%d",
 			    stats->mgmt_assoc,
 			    stats->mgmt_disassoc,
@@ -1648,8 +1645,7 @@ static void wma_wow_stats_display(struct wake_lock_stats *stats)
 			    stats->mgmt_deauth,
 			    stats->mgmt_action);
 
-	wma_conditional_log(is_wakeup_event_console_logs_enabled,
-			    "pno_match:%d pno_complete:%d gscan:%d low_rssi:%d"
+	wma_debug("pno_match:%d pno_complete:%d gscan:%d low_rssi:%d"
 			    " rssi_breach:%d oem:%d ucdrop:%d scan_11d:%d"
 			    " fatal_event:%d",
 			    stats->pno_match_wake_up_count,
@@ -2206,8 +2202,7 @@ static void wma_wow_parse_data_pkt(t_wma_handle *wma,
 
 	src_mac = data + QDF_NBUF_SRC_MAC_OFFSET;
 	dest_mac = data + QDF_NBUF_DEST_MAC_OFFSET;
-	wma_conditional_log(is_wakeup_event_console_logs_enabled,
-			    "Src_mac: " QDF_MAC_ADDR_FMT ", Dst_mac: "
+	wma_debug("Src_mac: " QDF_MAC_ADDR_FMT ", Dst_mac: "
 			    QDF_MAC_ADDR_FMT, QDF_MAC_ADDR_REF(src_mac),
 			    QDF_MAC_ADDR_REF(dest_mac));
 
@@ -2216,8 +2211,7 @@ static void wma_wow_parse_data_pkt(t_wma_handle *wma,
 	proto_subtype = wma_wow_get_pkt_proto_subtype(data, length);
 	proto_subtype_name = wma_pkt_proto_subtype_to_string(proto_subtype);
 	if (proto_subtype_name)
-		wma_conditional_log(is_wakeup_event_console_logs_enabled,
-				    "WOW Wakeup: %s rcvd", proto_subtype_name);
+		wma_debug("WOW Wakeup: %s rcvd", proto_subtype_name);
 
 	switch (proto_subtype) {
 	case QDF_PROTO_EAPOL_M1:
@@ -2520,7 +2514,7 @@ static int wma_wake_event_packet(
 		break;
 
 	default:
-		wma_err("Wake reason %s is not a packet event",
+		wma_debug("Wake reason %s is not a packet event",
 			 wma_wow_wake_reason_str(wake_info->wake_reason));
 		return -EINVAL;
 	}

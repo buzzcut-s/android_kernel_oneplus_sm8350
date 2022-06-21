@@ -1220,7 +1220,7 @@ static int haptic_read_f0_count_go(struct aw8697 *aw8697)
     ret = aw8697_i2c_read(aw8697, AW8697_REG_F_LRA_CONT_L, &reg_val);
     f0_reg |= (reg_val<<0);
     if (!f0_reg) {
-       pr_info("%s not get f0 because f0_reg value is 0!\n",__func__);
+       pr_debug("%s not get f0 because f0_reg value is 0!\n",__func__);
        return 0;
      }
      f0_tmp = 1000000000/(f0_reg*AW8697_HAPTIC_F0_COEFF);
@@ -1241,7 +1241,7 @@ static int haptic_read_f0_count_default(struct aw8697 *aw8697)
     ret = aw8697_i2c_read(aw8697, AW8697_REG_F_LRA_F0_L, &reg_val);
     f0_reg |= (reg_val<<0);
     if (!f0_reg) {
-       pr_info("%s not get f0 because f0_reg vaule is 0\n", __func__);
+       pr_debug("%s not get f0 because f0_reg vaule is 0\n", __func__);
        return 0;
     }
     f0_tmp = 1000000000/(f0_reg*AW8697_HAPTIC_F0_COEFF);
@@ -1277,7 +1277,7 @@ static int aw8697_haptic_read_cont_f0(struct aw8697 *aw8697)
     ret = aw8697_i2c_read(aw8697, AW8697_REG_F_LRA_CONT_L, &reg_val);
     f0_reg |= (reg_val<<0);
     if (!f0_reg) {
-        pr_info("%s not get f0 because f0_reg vaule is 0\n", __func__);
+        pr_debug("%s not get f0 because f0_reg vaule is 0\n", __func__);
         return 0;
     }
     f0_tmp = 1000000000/(f0_reg*AW8697_HAPTIC_F0_COEFF);
@@ -4083,7 +4083,7 @@ static ssize_t aw8697_rtp_store(struct device *dev, struct device_attribute *att
     /*OP add for juge rtp on end*/
 
     if (!aw8697->haptic_ready && (val == AUDIO_READY_STATUS)) {
-        pr_info("%s: invalid audio ready\n", __FUNCTION__);
+        pr_debug("%s: invalid audio ready\n", __FUNCTION__);
         return count;
     }
     if (val == HAL_FACTORY_MODE_NORMAL_RTP_NUMBER)
@@ -5802,13 +5802,13 @@ static void aw8697_vibrator_work_routine(struct work_struct *work)
        if (aw8697->pm_awake == false) {
            __pm_stay_awake(aw8697->vibrator_on);
            aw8697->pm_awake = true;
-           pr_info("aw8697->pm_awake:%d\n", aw8697->pm_awake);
+           pr_debug("aw8697->pm_awake:%d\n", aw8697->pm_awake);
        }
     } else {
         if (aw8697->pm_awake) {
             __pm_relax(aw8697->vibrator_on);
             aw8697->pm_awake = false;
-            pr_info("aw8697->pm_awake:%d\n", aw8697->pm_awake);
+            pr_debug("aw8697->pm_awake:%d\n", aw8697->pm_awake);
         }
     }
     aw8697_haptic_stop(aw8697);
@@ -5971,7 +5971,7 @@ static irqreturn_t aw8697_irq(int irq, void *data)
                 pr_debug("%s: aw8697 rtp mode fifo update, cnt=%d\n",
                         __func__, aw8697->rtp_cnt);
                 if (!aw8697_rtp) {
-                   pr_info("%s:aw8697_rtp is null break\n",
+                   pr_debug("%s:aw8697_rtp is null break\n",
                         __func__);
                    mutex_unlock(&aw8697->rtp_lock);
                    break;
@@ -6090,7 +6090,7 @@ static int aw8697_read_chipid(struct aw8697 *aw8697)
             aw8697_haptic_softreset(aw8697);
             return 0;
         default:
-            pr_info("%s unsupported device revision (0x%x)\n", __func__, reg );
+            pr_debug("%s unsupported device revision (0x%x)\n", __func__, reg );
             break;
         }
         cnt ++;
@@ -6360,7 +6360,7 @@ static int aw8697_i2c_probe(struct i2c_client *i2c, const struct i2c_device_id *
     aw8697->fb_notif.notifier_call = aw8697_fb_notifier_callback_tp;
     ret = msm_drm_register_client(&aw8697->fb_notif);
     if (ret)
-       pr_info("Unable to register fb_notifier: %d\n", ret);
+       pr_debug("Unable to register fb_notifier: %d\n", ret);
 /* add haptic audio tp mask end */
     pr_debug("%s probe completed successfully!\n", __func__);
 

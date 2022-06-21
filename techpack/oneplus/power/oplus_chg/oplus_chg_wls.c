@@ -2393,32 +2393,32 @@ static int oplus_chg_wls_mod_notifier_call(struct notifier_block *nb, unsigned l
 		oplus_chg_wls_config(wls_dev);
 		break;
 	case OPLUS_CHG_EVENT_LCD_ON:
-		pr_info("lcd on\n");
+		pr_debug("lcd on\n");
 		wls_status->led_on = true;
 		break;
 	case OPLUS_CHG_EVENT_LCD_OFF:
-		pr_info("lcd off\n");
+		pr_debug("lcd off\n");
 		wls_status->led_on = false;
 		break;
 	case OPLUS_CHG_EVENT_CALL_ON:
-		pr_info("call on\n");
+		pr_debug("call on\n");
 		vote(wls_dev->fcc_votable, CALL_VOTER, true, dynamic_cfg->wls_fast_chg_call_on_curr_ma, false);
 		break;
 	case OPLUS_CHG_EVENT_CALL_OFF:
-		pr_info("call off\n");
+		pr_debug("call off\n");
 		vote(wls_dev->fcc_votable, CALL_VOTER, false, 0, false);
 		break;
 	case OPLUS_CHG_EVENT_CAMERA_ON:
-		pr_info("camera on\n");
+		pr_debug("camera on\n");
 		vote(wls_dev->fcc_votable, CAMERA_VOTER, true, dynamic_cfg->wls_fast_chg_camera_on_curr_ma, false);
 		break;
 	case OPLUS_CHG_EVENT_CAMERA_OFF:
-		pr_info("camera off\n");
+		pr_debug("camera off\n");
 		vote(wls_dev->fcc_votable, CAMERA_VOTER, false, 0, false);
 		break;
 	case OPLUS_CHG_EVENT_RX_IIC_ERR:
 		if (wls_status->rx_present) {
-			pr_info("Restart the rx disable\n");
+			pr_debug("Restart the rx disable\n");
 			wls_dev->wls_status.online_keep = true;
 			vote(wls_dev->rx_disable_votable, RX_IIC_VOTER, true, 1, false);
 			queue_delayed_work(system_power_efficient_wq, &wls_dev->rx_iic_restore_work, msecs_to_jiffies(500));

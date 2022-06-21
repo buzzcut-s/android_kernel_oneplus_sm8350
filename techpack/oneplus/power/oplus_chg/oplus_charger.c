@@ -561,7 +561,7 @@ int oplus_battery_set_property(struct power_supply *psy, enum power_supply_prope
 #ifdef CONFIG_OPLUS_SHORT_C_BATT_CHECK
 #ifdef CONFIG_OPLUS_SHORT_USERSPACE
 	case POWER_SUPPLY_PROP_SHORT_C_LIMIT_CHG:
-		printk(KERN_ERR "[OPLUS_CHG] [short_c_bat] set limit chg[%d]\n", !!val->intval);
+		no_printk(KERN_ERR "[OPLUS_CHG] [short_c_bat] set limit chg[%d]\n", !!val->intval);
 		chip->short_c_batt.limit_chg = !!val->intval;
 
 		if (!!val->intval == 0) {
@@ -569,25 +569,25 @@ int oplus_battery_set_property(struct power_supply *psy, enum power_supply_prope
 		}
 		break;
 	case POWER_SUPPLY_PROP_SHORT_C_LIMIT_RECHG:
-		printk(KERN_ERR "[OPLUS_CHG] [short_c_bat] set limit rechg[%d]\n", !!val->intval);
+		no_printk(KERN_ERR "[OPLUS_CHG] [short_c_bat] set limit rechg[%d]\n", !!val->intval);
 		chip->short_c_batt.limit_rechg = !!val->intval;
 		break;
 #else
 	case POWER_SUPPLY_PROP_SHORT_C_BATT_UPDATE_CHANGE:
-		printk(KERN_ERR "[OPLUS_CHG] [short_c_batt]: set update change[%d]\n", val->intval);
+		no_printk(KERN_ERR "[OPLUS_CHG] [short_c_batt]: set update change[%d]\n", val->intval);
 		oplus_short_c_batt_update_change(chip, val->intval);
 		chip->short_c_batt.update_change = val->intval;
 		break;
 
 	case POWER_SUPPLY_PROP_SHORT_C_BATT_IN_IDLE:
-		printk(KERN_ERR "[OPLUS_CHG] [short_c_batt]: set in idle[%d]\n", !!val->intval);
+		no_printk(KERN_ERR "[OPLUS_CHG] [short_c_batt]: set in idle[%d]\n", !!val->intval);
 		chip->short_c_batt.in_idle = !!val->intval;
 		break;
 #endif /*CONFIG_OPLUS_SHORT_USERSPACE*/
 #endif /* CONFIG_OPLUS_SHORT_C_BATT_CHECK */
 #ifdef CONFIG_OPLUS_SHORT_HW_CHECK
 	case POWER_SUPPLY_PROP_SHORT_C_HW_FEATURE:
-		printk(KERN_ERR "[OPLUS_CHG] [short_c_hw_check]: set is_feature_hw_on [%d]\n", val->intval);
+		no_printk(KERN_ERR "[OPLUS_CHG] [short_c_hw_check]: set is_feature_hw_on [%d]\n", val->intval);
 		chip->short_c_batt.is_feature_hw_on = val->intval;
 		break;
 #endif /* CONFIG_OPLUS_SHORT_C_BATT_CHECK */

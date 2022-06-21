@@ -42,7 +42,7 @@ int oplus_panel_send_msd_aod_command(struct dsi_panel *panel)
 		rc = dsi_panel_tx_cmd_set(panel, DSI_CMD_SET_MSD_AOD_ON);
 		if (rc)
 			pr_err("Failed to send msd aod on command\n");
-		pr_err("Send DSI_CMD_SET_MSD_AOD_ON cmds.\n");
+		pr_debug("Send DSI_CMD_SET_MSD_AOD_ON cmds.\n");
 	} else {
 		count = mode->priv_info->cmd_sets[DSI_CMD_SET_MSD_AOD_OFF].count;
 		if (!count) {
@@ -52,7 +52,7 @@ int oplus_panel_send_msd_aod_command(struct dsi_panel *panel)
 		rc = dsi_panel_tx_cmd_set(panel, DSI_CMD_SET_MSD_AOD_OFF);
 		if (rc)
 			pr_err("Failed to send msd aod off command\n");
-		pr_err("Send DSI_CMD_SET_MSD_AOD_OFF cmds.\n");
+		pr_debug("Send DSI_CMD_SET_MSD_AOD_OFF cmds.\n");
 	}
 error:
 	return rc;

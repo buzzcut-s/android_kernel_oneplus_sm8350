@@ -782,7 +782,7 @@ static int goodix_fb_state_chg_callback(
 	blank = *(int *)(evdata->data);
 
 	if (val == 5) {
-		pr_info("[%s] UI ready enter\n", __func__);
+		pr_debug("[%s] UI ready enter\n", __func__);
 
 		switch (blank) {
 		case 0:
