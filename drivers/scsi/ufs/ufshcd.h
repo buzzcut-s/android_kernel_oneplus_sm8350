@@ -1582,4 +1582,6 @@ int ufshcd_uic_hibern8_enter(struct ufs_hba *hba);
 int ufshcd_uic_hibern8_exit(struct ufs_hba *hba);
 int ufshcd_read_string_desc(struct ufs_hba *hba, u8 desc_index,
 			    u8 **buf, bool ascii);
+
+bool ufshcd_any_tag_in_use(struct ufs_hba *hba);
 #endif /* End of Header */

@@ -1621,7 +1621,7 @@ static bool ufshcd_is_busy(struct request *req, void *priv, bool reserved)
 }
 
 /* Whether or not any tag is in use by a request that is in progress. */
-static bool ufshcd_any_tag_in_use(struct ufs_hba *hba)
+bool ufshcd_any_tag_in_use(struct ufs_hba *hba)
 {
 	struct request_queue *q = hba->cmd_queue;
 	int busy = 0;
@@ -2924,7 +2924,6 @@ static int ufshcd_queuecommand(struct Scsi_Host *host, struct scsi_cmnd *cmd)
 		if (err) {
 			ufshcd_release(hba);
 			lrbp->cmd = NULL;
-			clear_bit_unlock(tag, &hba->lrb_in_use);
 			goto out;
 		}
 	}
