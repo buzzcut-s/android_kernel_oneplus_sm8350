@@ -35,10 +35,6 @@
 #define CREATE_TRACE_POINTS
 #include "trace-rpmh.h"
 
-#include <linux/ipc_logging.h>
-
-#define RSC_DRV_IPC_LOG_SIZE		2
-
 #define RSC_DRV_TCS_OFFSET		672
 #define RSC_DRV_CMD_OFFSET		20
 
@@ -431,7 +427,6 @@ static irqreturn_t tcs_tx_done(int irq, void *p)
 	irq_status = readl_relaxed(drv->tcs_base + RSC_DRV_IRQ_STATUS);
 
 	if (bitmap_empty(drv->tcs_in_use, MAX_TCS_NR)) {
-		ipc_log_string(drv->ipc_log_ctx, "Spurious IRQ: status=%lu", irq_status);
 		writel_relaxed(irq_status, drv->tcs_base + RSC_DRV_IRQ_CLEAR);
 		return IRQ_HANDLED;
 	}
@@ -444,7 +439,6 @@ static irqreturn_t tcs_tx_done(int irq, void *p)
 		}
 
 		trace_rpmh_tx_done(drv, i, req);
-		ipc_log_string(drv->ipc_log_ctx, "IRQ response: m=%d", i);
 
 		/*
 		 * If wake tcs was re-purposed for sending active
@@ -511,10 +505,6 @@ static void __tcs_buffer_write(struct rsc_drv *drv, int tcs_id, int cmd_id,
 		write_tcs_cmd(drv, RSC_DRV_CMD_ADDR, tcs_id, j, cmd->addr);
 		write_tcs_cmd(drv, RSC_DRV_CMD_DATA, tcs_id, j, cmd->data);
 		trace_rpmh_send_msg(drv, tcs_id, j, msgid, cmd);
-		ipc_log_string(drv->ipc_log_ctx,
-			       "TCS write: m=%d n=%d msgid=%#x addr=%#x data=%#x wait=%d",
-			       tcs_id, j, msgid, cmd->addr,
-			       cmd->data, cmd->wait);
 	}
 
 	cmd_enable |= read_tcs_reg(drv, RSC_DRV_CMD_ENABLE, tcs_id);
@@ -799,9 +789,6 @@ int rpmh_rsc_write_pdc_data(struct rsc_drv *drv, const struct tcs_request *msg)
 		/* Only data is write capable */
 		writel_relaxed(cmd->data, addr);
 		trace_rpmh_send_msg(drv, RSC_PDC_DRV_DATA, i, 0, cmd);
-		ipc_log_string(drv->ipc_log_ctx,
-			       "PDC write: n=%d addr=%#x data=%x",
-			       i, cmd->addr, cmd->data);
 		addr += RSC_PDC_DATA_OFFSET;
 	}
 
@@ -1065,8 +1052,6 @@ int rpmh_rsc_mode_solver_set(struct rsc_drv *drv, bool enable)
 		if (!enable || !rpmh_rsc_ctrlr_is_busy(drv)) {
 			drv->in_solver_mode = enable;
 			trace_rpmh_solver_set(drv, enable);
-			ipc_log_string(drv->ipc_log_ctx,
-				       "solver mode set: %d", enable);
 			ret = 0;
 		}
 		spin_unlock(&drv->lock);
@@ -1337,9 +1322,6 @@ static int rpmh_rsc_probe(struct platform_device *pdev)
 	spin_lock_init(&drv->client.cache_lock);
 	INIT_LIST_HEAD(&drv->client.cache);
 	INIT_LIST_HEAD(&drv->client.batch_cache);
-
-	drv->ipc_log_ctx = ipc_log_context_create(RSC_DRV_IPC_LOG_SIZE,
-						  drv->name, 0);
 
 	dev_set_drvdata(&pdev->dev, drv);
 
