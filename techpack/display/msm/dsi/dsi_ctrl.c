@@ -2958,7 +2958,7 @@ static int _dsi_ctrl_setup_isr(struct dsi_ctrl *dsi_ctrl)
 		rc = irq_num;
 	} else {
 		rc = devm_request_threaded_irq(&dsi_ctrl->pdev->dev, irq_num,
-				dsi_ctrl_isr, NULL, IRQF_NO_THREAD, "dsi_ctrl", dsi_ctrl);
+				dsi_ctrl_isr, NULL, IRQF_NO_THREAD | IRQF_PRIME_AFFINE, "dsi_ctrl", dsi_ctrl);
 		if (rc) {
 			DSI_CTRL_ERR(dsi_ctrl, "Failed to request IRQ, %d\n",
 					rc);
