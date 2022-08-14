@@ -242,6 +242,8 @@ static void disable_rimps_timer(struct lpm_cpu *cpu)
 	ctrl_val = readl_relaxed(cpu->rimps_tmr_base + TIMER_CTRL);
 	writel_relaxed(ctrl_val & ~(TIMER_CONTROL_EN),
 				cpu->rimps_tmr_base + TIMER_CTRL);
+	/* Ensure the write is complete before returning. */
+	wmb();
 	spin_unlock(&cpu->cpu_lock);
 
 }
@@ -275,6 +277,8 @@ static void program_rimps_timer(struct lpm_cpu *cpu)
 	writel_relaxed(next_event, cpu->rimps_tmr_base + TIMER_VAL);
 	writel_relaxed(ctrl_val | (TIMER_CONTROL_EN),
 				cpu->rimps_tmr_base + TIMER_CTRL);
+	/* Ensure the write is complete before returning. */
+	wmb();
 	spin_unlock(&cpu->cpu_lock);
 }
 
