@@ -1822,7 +1822,7 @@ static int qsmmuv500_cfg_probe(struct arm_smmu_device *smmu)
 
 static int qsmmuv500_init_context(struct arm_smmu_domain *smmu_domain)
 {
-	smmu_domain->flush_walk_prefer_tlbiasid = true;
+	smmu_domain->smmu->flush_walk_prefer_tlbiasid = true;
 
 	return 0;
 }
